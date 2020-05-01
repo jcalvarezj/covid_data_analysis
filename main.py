@@ -93,43 +93,5 @@ def main():
             print('\nSorry, only numbers are valid! Try again\n')
 
 
-"""
-
-def main():
-    finished = False
-    dataset_option = 0
-    
-    
-    while (not finished):
-        option = prompt_user(menu_level)
-
-        if option == 'x':
-            finished = True
-        else:            
-            try:
-                menu_level = int(option)
-                if (menu_level < 0 or menu_level > 2):
-                    raise ValueError()
-                else:
-                    option = prompt_user(menu_level)
-                    if option == 'x':
-                        finished = True
-                    else:
-                        category = int(option)
-                        if menu_level == 1:
-                            if (category >= 1 or category <= 6):
-                                filter_beds(category)
-                            else:
-                                raise ValueError()
-                        elif menu_level == 2:
-                            print("To implement") # TODO: filter_measures()
-                        else:
-                            raise ValueError()
-            except ValueError:
-                print('\nSorry, that is not a valid option! Try again\n')
-"""
-
-
-
 if __name__ == "__main__":
     main()
