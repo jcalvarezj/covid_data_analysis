@@ -1,5 +1,5 @@
-import os
-from beds import BedsRecord, BedTypesData
+import sys
+from beds_data import BedsRecord, BedTypesData
 from enum import Enum
 import pandas as pd
 import traceback
@@ -55,11 +55,13 @@ def filter_beds(category):
     filter category
     """
     try:
-        data = pd.read_csv(BedsFilter.BEDS_FILENAME.value)
+        data = pd.read_csv(BedsFilter.BEDS_FILENAME.value).head(BedsFilter \
+                                                        .BED_RECORDS_NUMBER \
+                                                        .value)
         if (category == BedsFilter.NUMBER_PERCENT_COUNTRY_NORMAL.value):
-            return data
+            return process_without_filter(data)
         elif (category == BedsFilter.TOP_COUNTRIES_BY_SCALE.value):
-            raise Exception("Not implemented yet")
+            return process_by_capacity(data)
         elif (category == BedsFilter.BOTTOM_COUNTRIES_BY_SCALE.value):
             raise Exception("Not implemented yet")
         elif (category == BedsFilter.TOP_COUNTRIES_BY_ESTIMATE.value):
@@ -82,7 +84,60 @@ def validate_option(option, min_value, max_value):
         return False
 
 
-def process_raw_data(data):
+def process_without_filter(data):
+    records = []
+
+    country_data = data.groupby('country')
+
+    for country_name, country_group in country_data:
+        beds_average = country_group['beds'].mean()
+        beds_total = country_group['beds'].sum()
+        population = country_group['population'].mean()
+        bed_types_list = country_group['beds']
+        bed_total_count = bed_types_list.sum()
+
+        new_record = BedsRecord(code = country_name.lower(),
+                                lat = float(country_group['lat'].values[0]),
+                                lng = float(country_group['lng'].values[0]),
+                                beds_total = float(bed_total_count),
+                                beds_average = float(beds_average),
+                                population_average = population,
+                                estimated_beds_total = float(beds_average))
+
+        bed_types_objects = []
+        
+        bed_types_groups = country_group.groupby('type')
+
+        for type_name, type_group in bed_types_groups:
+            type_bed_count = float(type_group['beds'].values[0])
+            type_percentage = 100 * type_bed_count / bed_total_count
+            type_population = int(type_group['population'].values[0])
+            type_estimated = type_population * type_bed_count / 10
+            source = type_group['source'].values[0]
+            source_url = type_group['source_url'].values[0]
+            year = type_group['year'].values[0]
+
+            new_type_data = BedTypesData(type_name = type_name.lower(), \
+                                         count = type_bed_count, \
+                                         percentage = type_percentage, \
+                                         estimated_for_population = \
+                                             type_estimated, \
+                                         population = type_population, \
+                                         source = source, \
+                                         source_url = source_url, \
+                                         year = int(year))
+
+            new_record.add_bed_type(new_type_data.getStructure())
+
+        records.append(new_record)
+
+    return records
+
+
+def process_by_capacity(data, descending = True):
+    """
+    Filters by the N top or bottom countries by bed count
+    """
     records = []
 
     country_data = data.groupby('country')
@@ -154,22 +209,20 @@ def main():
                             if (filter_option == 0):
                                 filter_navigation = False
                             else:
-                                raw_data = filter_beds(filter_option) \
-                                               .head(BedsFilter \
-                                                        .BED_RECORDS_NUMBER \
-                                                        .value)
-                                records = process_raw_data(raw_data)
+                                records = filter_beds(filter_option)
+                                               
+                                #records = process_without_filter(raw_data)
                                 print('\nResults for the chosen filter\n')
-                                for r in records:
-                                    print(r)
+                                print(records)
+                                #for r in records:
+                                #    print(r)
                 else:
                     raise Exception("Not implemented yet")
         except ValueError:
             print('\nSorry, only numbers are valid! Try again\n')
-        except Exception as e:
-            print("An error happened!")
-            print(e)
+        except Exception as e:            
             traceback.print_exc()
+            sys.exit(f'An error happened! \n {e} \n')
 
 
 if __name__ == "__main__":

@@ -32,6 +32,10 @@ class BedsRecord:
         }        
         return json.dumps(structure, indent=4)
 
+
+    def __repr__(self):
+        return str(self)
+
     
     def add_bed_type(self, bed_type):
         """
