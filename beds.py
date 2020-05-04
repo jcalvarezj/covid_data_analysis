@@ -5,16 +5,16 @@ class BedsRecord:
     This class represents a record from the beds capacity dataset
     """
     def __init__(self, code=None, lat=None, lng=None, beds_average=None,
-                 population=None, estimated_beds_average=None, source=None,
-                 source_url=None):
+                 beds_total=None, population_average=None, 
+                 estimated_beds_total=None, estimated_beds_average=None):
         self._code = code
         self._lat = lat
         self._lng = lng
         self._beds_average = beds_average
-        self._population = population
+        self._beds_total = beds_total
+        self._population_average = population_average
+        self._estimated_beds_total = estimated_beds_total
         self._estimated_beds_average = estimated_beds_average
-        self._source = source
-        self._source_url = source_url
         self._bed_type = []
 
 
@@ -24,10 +24,10 @@ class BedsRecord:
             'lat': self._lat,
             'lng': self._lng,
             'bedsAverage': self._beds_average,
-            'population': self._population,
+            'bedsTotal': self._beds_total,
+            'populationAverage': self._population_average,
+            'estimatedBedsTotal': self._estimated_beds_total,
             'estimatedBedsAverage': self._estimated_beds_average,
-            'source': self._source,
-            'sourceUrl': self._source_url,
             'bedType': self._bed_type
         }        
         return json.dumps(structure, indent=4)

@@ -17,9 +17,10 @@ class BedsFilter(Enum):
     BOTTOM_COUNTRIES_BY_ESTIMATE = 5
     TOP_COUNTRIES_BY_AVERAGE = 6
     BOTTOM_COUNTRIES_BY_AVERAGE = 7
+    BEDS_FILENAME = './data/hospital_beds.csv'
+    BED_RECORDS_NUMBER = 24
 
 
-BEDS_FILENAME = './data/hospital_beds.csv'
 MENU = [
     '''Please enter the desired option: 
 
@@ -55,7 +56,7 @@ def filter_beds(category):
     filter category
     """
     try:
-        data = pd.read_csv(BEDS_FILENAME)
+        data = pd.read_csv(BedsFilter.BEDS_FILENAME.value)
         if (category == BedsFilter.NUMBER_PERCENT_COUNTRY_NORMAL.value):
             return data
         elif (category == BedsFilter.TOP_COUNTRIES_BY_SCALE.value):
@@ -69,7 +70,7 @@ def filter_beds(category):
         elif (category == BedsFilter.NUMBER_PERCENT_COUNTRY_NORMAL.value):
             raise Exception("Not implemented yet")
     except FileNotFoundError:
-        print(f'The file "{BEDS_FILENAME}" does not exist')
+        print(f'The file "{BedsFilter.BEDS_FILENAME.value}" does not exist')
     except Exception as e:
         print(e)
 
@@ -94,33 +95,23 @@ def process_raw_data(data):
         print('--------\n\n')
 
         beds_average = group['beds'].mean()
-
         population = group['population'].mean()
-
-        # print(f'Promedio de camas para {name}: {beds_average}')
-
         bed_type = group['beds']
-
         bed_type_count = bed_type.sum()
 
-        # print(f'Los tipos para {name} son\n{bed_type} de total {bed_type_count}')
-
-
-        # print(f'Las coordenadas de {name} son {group.lat[0]} {group.lng[0]}')
-
-        # print(f"CREANDO REGISTRO PARA {name} ... grupo: {group.values[0]}")
-
         new_record = BedsRecord(code = name.lower(),
-                                lat = float(group.lat.values[0]),
-                                lng = float(group.lng.values[0]),
+                                lat = float(group['lat'].values[0]),
+                                lng = float(group['lng'].values[0]),
                                 beds_average = float(beds_average),
-                                population = population,
-                                estimated_beds_average = float(beds_average))
+                                population_average = population,
+                                estimated_beds_total = float(beds_average))
 
         print(f'MI NUEVO REGISTRO ES!!! ')
-        print(new_record)        
+        print(new_record)
 
-        # records.append(new_record)
+        records.append(new_record)
+
+    return records
 
 
 def main():
@@ -145,8 +136,10 @@ def main():
                             if (filter_option == 0):
                                 filter_navigation = False
                             else:
-                                raw_data = filter_beds(filter_option).head(6)
-
+                                raw_data = filter_beds(filter_option) \
+                                               .head(BedsFilter \
+                                                        .BED_RECORDS_NUMBER \
+                                                        .value)
                                 records = process_raw_data(raw_data)
                 else:
                     raise Exception("Not implemented yet")
