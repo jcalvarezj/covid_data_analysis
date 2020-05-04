@@ -127,9 +127,6 @@ def process_raw_data(data):
 
             new_record.add_bed_type(new_type_data.getStructure())
 
-        print(f'\nTHE NEW RECORD IS: ')
-        print(new_record)
-
         records.append(new_record)
 
     return records
@@ -162,6 +159,9 @@ def main():
                                                         .BED_RECORDS_NUMBER \
                                                         .value)
                                 records = process_raw_data(raw_data)
+                                print('\nResults for the chosen filter\n')
+                                for r in records:
+                                    print(r)
                 else:
                     raise Exception("Not implemented yet")
         except ValueError:
