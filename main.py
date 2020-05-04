@@ -84,13 +84,8 @@ def validate_option(option, min_value, max_value):
         return False
 
 
-def process_without_filter(data):
-    """
-    Returns the basic structure of the whole dataset as a list of BedsRecords
-    """
+def pack_records(country_data):
     records = []
-
-    country_data = data.groupby('country')
 
     for country_name, country_group in country_data:
         beds_average = country_group['beds'].mean()
@@ -105,8 +100,6 @@ def process_without_filter(data):
                                 beds_average = float(beds_average),
                                 population_average = population)
 
-        bed_types_objects = []
-        
         bed_types_groups = country_group.groupby('type')
 
         estimated_beds_total = 0
@@ -121,14 +114,14 @@ def process_without_filter(data):
             source_url = type_group['source_url'].values[0]
             year = type_group['year'].values[0]
 
-            new_type_data = BedTypesData(type_name = type_name.lower(), \
-                                         count = type_bed_count, \
-                                         percentage = type_percentage, \
+            new_type_data = BedTypesData(type_name = type_name.lower(),
+                                         count = type_bed_count,
+                                         percentage = type_percentage,
                                          estimated_for_population = \
-                                             type_estimated, \
-                                         population = type_population, \
-                                         source = source, \
-                                         source_url = source_url, \
+                                             type_estimated,
+                                         population = type_population,
+                                         source = source,
+                                         source_url = source_url,
                                          year = int(year))
 
             new_record.add_bed_type(new_type_data.getStructure())
@@ -142,6 +135,15 @@ def process_without_filter(data):
         records.append(new_record)
 
     return records
+
+
+def process_without_filter(data):
+    """
+    Returns the basic structure of the whole dataset as a list of BedsRecords
+    """    
+    country_data = data.groupby('country')
+
+    return(pack_records(country_data))
 
 
 def process_by_scale_capacity(data, descending = True):
@@ -149,66 +151,16 @@ def process_by_scale_capacity(data, descending = True):
     Filters by the N top or bottom countries by bed count and returns the list
     of the filtered BedsRecords
     """
-    records = []
+    
 
     data['bedsAverage'] = data.groupby('country')['beds'].transform('mean')
     data['bedsTotal'] = data.groupby('country')['beds'].transform('sum')
     data['populationAverage'] = data.groupby('country')['population'].transform('mean')
     data['populationAverage'] = data.groupby('country')['population'].transform('mean')
 
-
     country_data = data.groupby('country')
 
-    for country_name, country_group in country_data:
-        beds_average = country_group['beds'].mean()
-        beds_total = country_group['beds'].sum()
-        population = country_group['population'].mean()
-        bed_types_list = country_group['beds']        
-
-        new_record = BedsRecord(code = country_name.lower(),
-                                lat = float(country_group['lat'].values[0]),
-                                lng = float(country_group['lng'].values[0]),
-                                beds_total = float(beds_total),
-                                beds_average = float(beds_average),
-                                population_average = population)
-
-        bed_types_objects = []
-        
-        bed_types_groups = country_group.groupby('type')
-
-        estimated_beds_total = 0
-        types_number = 0
-
-        for type_name, type_group in bed_types_groups:
-            type_bed_count = float(type_group['beds'].values[0])
-            type_percentage = 100 * type_bed_count / beds_total
-            type_population = float(type_group['population'].values[0])
-            type_estimated = type_population * type_bed_count / 10
-            source = type_group['source'].values[0]
-            source_url = type_group['source_url'].values[0]
-            year = type_group['year'].values[0]
-
-            new_type_data = BedTypesData(type_name = type_name.lower(), \
-                                         count = type_bed_count, \
-                                         percentage = type_percentage, \
-                                         estimated_for_population = \
-                                             type_estimated, \
-                                         population = type_population, \
-                                         source = source, \
-                                         source_url = source_url, \
-                                         year = int(year))
-
-            new_record.add_bed_type(new_type_data.getStructure())
-
-            estimated_beds_total += type_estimated
-            types_number += 1
-
-        new_record.set_estimated_beds_total(estimated_beds_total)
-        new_record.set_estimated_beds_average(estimated_beds_total, types_number)
-
-        records.append(new_record)
-
-    return records
+    return pack_records(country_data)
 
 
 def main():
