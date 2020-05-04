@@ -5,16 +5,15 @@ class BedsRecord:
     This class represents a record from the beds capacity dataset
     """
     def __init__(self, code=None, lat=None, lng=None, beds_average=None,
-                 beds_total=None, population_average=None, 
-                 estimated_beds_total=None, estimated_beds_average=None):
+                 beds_total=None, population_average=None):
         self._code = code
         self._lat = lat
         self._lng = lng
         self._beds_average = beds_average
         self._beds_total = beds_total
         self._population_average = population_average
-        self._estimated_beds_total = estimated_beds_total
-        self._estimated_beds_average = estimated_beds_average
+        self._estimated_beds_total = None
+        self._estimated_beds_average = None
         self._bed_type = []
 
 
@@ -42,6 +41,17 @@ class BedsRecord:
         Adds a BedTypesData object to the instance's bed_type list
         """
         self._bed_type.append(bed_type)
+
+    
+    def set_estimated_beds_total(self, estimated_beds_total):
+        self._estimated_beds_total = estimated_beds_total
+
+    
+    def set_estimated_beds_average(self, estimated_beds_average, types_number):
+        if (types_number != 0):
+            self._estimated_beds_average = estimated_beds_average/types_number
+        else:
+            self._estimated_beds_average = None
 
 
 class BedTypesData:

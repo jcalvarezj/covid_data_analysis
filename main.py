@@ -55,15 +55,15 @@ def filter_beds(category):
     filter category
     """
     try:
-        data = pd.read_csv(BedsFilter.BEDS_FILENAME.value).head(BedsFilter \
-                                                        .BED_RECORDS_NUMBER \
-                                                        .value)
+        data = pd.read_csv(BedsFilter.BEDS_FILENAME.value) \
+                   .head(BedsFilter.BED_RECORDS_NUMBER.value)
+        ## TODO: Remove head for processing the full dataset
         if (category == BedsFilter.NUMBER_PERCENT_COUNTRY_NORMAL.value):
             return process_without_filter(data)
         elif (category == BedsFilter.TOP_COUNTRIES_BY_SCALE.value):
-            return process_by_capacity(data)
+            return process_by_scale_capacity(data)
         elif (category == BedsFilter.BOTTOM_COUNTRIES_BY_SCALE.value):
-            raise Exception("Not implemented yet")
+            return process_by_scale_capacity(data, False)
         elif (category == BedsFilter.TOP_COUNTRIES_BY_ESTIMATE.value):
             raise Exception("Not implemented yet")
         elif (category == BedsFilter.BOTTOM_COUNTRIES_BY_ESTIMATE.value):
@@ -85,6 +85,9 @@ def validate_option(option, min_value, max_value):
 
 
 def process_without_filter(data):
+    """
+    Returns the basic structure of the whole dataset as a list of BedsRecords
+    """
     records = []
 
     country_data = data.groupby('country')
@@ -93,25 +96,26 @@ def process_without_filter(data):
         beds_average = country_group['beds'].mean()
         beds_total = country_group['beds'].sum()
         population = country_group['population'].mean()
-        bed_types_list = country_group['beds']
-        bed_total_count = bed_types_list.sum()
+        bed_types_list = country_group['beds']        
 
         new_record = BedsRecord(code = country_name.lower(),
                                 lat = float(country_group['lat'].values[0]),
                                 lng = float(country_group['lng'].values[0]),
-                                beds_total = float(bed_total_count),
+                                beds_total = float(beds_total),
                                 beds_average = float(beds_average),
-                                population_average = population,
-                                estimated_beds_total = float(beds_average))
+                                population_average = population)
 
         bed_types_objects = []
         
         bed_types_groups = country_group.groupby('type')
 
+        estimated_beds_total = 0
+        types_number = 0
+
         for type_name, type_group in bed_types_groups:
             type_bed_count = float(type_group['beds'].values[0])
-            type_percentage = 100 * type_bed_count / bed_total_count
-            type_population = int(type_group['population'].values[0])
+            type_percentage = 100 * type_bed_count / beds_total
+            type_population = float(type_group['population'].values[0])
             type_estimated = type_population * type_bed_count / 10
             source = type_group['source'].values[0]
             source_url = type_group['source_url'].values[0]
@@ -128,17 +132,30 @@ def process_without_filter(data):
                                          year = int(year))
 
             new_record.add_bed_type(new_type_data.getStructure())
+
+            estimated_beds_total += type_estimated
+            types_number += 1
+
+        new_record.set_estimated_beds_total(estimated_beds_total)
+        new_record.set_estimated_beds_average(estimated_beds_total, types_number)
 
         records.append(new_record)
 
     return records
 
 
-def process_by_capacity(data, descending = True):
+def process_by_scale_capacity(data, descending = True):
     """
-    Filters by the N top or bottom countries by bed count
+    Filters by the N top or bottom countries by bed count and returns the list
+    of the filtered BedsRecords
     """
     records = []
+
+    data['bedsAverage'] = data.groupby('country')['beds'].transform('mean')
+    data['bedsTotal'] = data.groupby('country')['beds'].transform('sum')
+    data['populationAverage'] = data.groupby('country')['population'].transform('mean')
+    data['populationAverage'] = data.groupby('country')['population'].transform('mean')
+
 
     country_data = data.groupby('country')
 
@@ -146,25 +163,26 @@ def process_by_capacity(data, descending = True):
         beds_average = country_group['beds'].mean()
         beds_total = country_group['beds'].sum()
         population = country_group['population'].mean()
-        bed_types_list = country_group['beds']
-        bed_total_count = bed_types_list.sum()
+        bed_types_list = country_group['beds']        
 
         new_record = BedsRecord(code = country_name.lower(),
                                 lat = float(country_group['lat'].values[0]),
                                 lng = float(country_group['lng'].values[0]),
-                                beds_total = float(bed_total_count),
+                                beds_total = float(beds_total),
                                 beds_average = float(beds_average),
-                                population_average = population,
-                                estimated_beds_total = float(beds_average))
+                                population_average = population)
 
         bed_types_objects = []
         
         bed_types_groups = country_group.groupby('type')
 
+        estimated_beds_total = 0
+        types_number = 0
+
         for type_name, type_group in bed_types_groups:
             type_bed_count = float(type_group['beds'].values[0])
-            type_percentage = 100 * type_bed_count / bed_total_count
-            type_population = int(type_group['population'].values[0])
+            type_percentage = 100 * type_bed_count / beds_total
+            type_population = float(type_group['population'].values[0])
             type_estimated = type_population * type_bed_count / 10
             source = type_group['source'].values[0]
             source_url = type_group['source_url'].values[0]
@@ -181,6 +199,12 @@ def process_by_capacity(data, descending = True):
                                          year = int(year))
 
             new_record.add_bed_type(new_type_data.getStructure())
+
+            estimated_beds_total += type_estimated
+            types_number += 1
+
+        new_record.set_estimated_beds_total(estimated_beds_total)
+        new_record.set_estimated_beds_average(estimated_beds_total, types_number)
 
         records.append(new_record)
 
@@ -210,12 +234,10 @@ def main():
                                 filter_navigation = False
                             else:
                                 records = filter_beds(filter_option)
-                                               
-                                #records = process_without_filter(raw_data)
+
                                 print('\nResults for the chosen filter\n')
-                                print(records)
-                                #for r in records:
-                                #    print(r)
+                                print(str(records))
+
                 else:
                     raise Exception("Not implemented yet")
         except ValueError:
