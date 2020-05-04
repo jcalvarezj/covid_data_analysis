@@ -36,10 +36,4 @@ This program made in Python is used to filter data from CSV files from two datas
 
 ## Execution
 
-    Use either 
-        
-        `python main.py` 
-        
-    or 
-    
-        `python3 main.py`
+   Use either  `python main.py`  or  `python3 main.py`
