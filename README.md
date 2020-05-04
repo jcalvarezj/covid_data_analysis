@@ -1,5 +1,7 @@
 # Data Analysis Tool for COVID-19-related Datasets
 
+## -- Work In Progress --
+
 This program made in Python is used to filter data from CSV files from two datasets related to the COVID-19 pandemic:
 
 1. [Global Hospital Beds Capacity (for covid-19) by Igor Kiulian](https://www.kaggle.com/ikiulian/global-hospital-beds-capacity-for-covid19)
@@ -34,4 +36,10 @@ This program made in Python is used to filter data from CSV files from two datas
 
 ## Execution
 
-    Either `python main.py` or `python3 main.py`
+    Use either 
+        
+        `python main.py` 
+        
+    or 
+    
+        `python3 main.py`
