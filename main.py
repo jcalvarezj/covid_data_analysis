@@ -1,5 +1,5 @@
 import os
-from beds import BedsRecord
+from beds import BedsRecord, BedTypesData
 from enum import Enum
 import pandas as pd
 import traceback
@@ -29,12 +29,11 @@ MENU = [
     (0) Exit program''',
     '''\nBeds dataset chosen. What filter would you like to apply?
 
-    (1) No filter; bring all data as JSON
-    (2) Number and percentage of beds per type, by country (scale)
-    (3) Top 10 countries with higher bed capacity (scale)
-    (4) Top 10 countries with higher bed capacity (estimated total)
-    (5) Top 10 countries with lower bed capacity (scale)
-    (6) Top 10 countries with lower bed capacity (estimated total)
+    (1) Number and percentage of beds per type, by country (scale)
+    (2) Top 10 countries with higher bed capacity (scale)
+    (3) Top 10 countries with higher bed capacity (estimated total)
+    (4) Top 10 countries with lower bed capacity (scale)
+    (5) Top 10 countries with lower bed capacity (estimated total)
     (0) Go back''',
     '''\nMeasures dataset chosen. What filter would you like to apply?
 
@@ -88,23 +87,52 @@ def process_raw_data(data):
 
     country_data = data.groupby('country')
 
-    for name, group in country_data:
-        print(name)
+    for country_name, country_group in country_data:
+        print(country_name)
         print('--------')
-        print(group)
+        print(country_group)
         print('--------\n\n')
 
-        beds_average = group['beds'].mean()
-        population = group['population'].mean()
-        bed_type = group['beds']
-        bed_type_count = bed_type.sum()
+        beds_average = country_group['beds'].mean()
+        beds_total = country_group['beds'].sum()
+        population = country_group['population'].mean()
+        bed_types_list = country_group['beds']
+        bed_total_count = bed_types_list.sum()
 
-        new_record = BedsRecord(code = name.lower(),
-                                lat = float(group['lat'].values[0]),
-                                lng = float(group['lng'].values[0]),
+        new_record = BedsRecord(code = country_name.lower(),
+                                lat = float(country_group['lat'].values[0]),
+                                lng = float(country_group['lng'].values[0]),
+                                beds_total = float(bed_total_count),
                                 beds_average = float(beds_average),
                                 population_average = population,
                                 estimated_beds_total = float(beds_average))
+
+        bed_types_objects = []
+        
+        bed_types_groups = country_group.groupby('type')
+
+        print('Los grupos de tipo son-------------------------')
+
+        for type_name, type_group in bed_types_groups:
+            #print(f'{type_name}\n**************\n{type_group}')
+
+            type_bed_count = float(type_group['beds'].values[0])
+            type_percentage = 100 * type_bed_count / bed_total_count
+            type_population = int(type_group['population'].values[0])
+            type_estimated = type_population * type_bed_count / 10
+            source = type_group['source'].values[0]
+            source_url = type_group['source_url'].values[0]
+
+            new_type_data = BedTypesData(type_name = type_name.lower(), \
+                                         count = type_bed_count, \
+                                         percentage = type_percentage, \
+                                         estimated_for_population = \
+                                             type_estimated, \
+                                         population = type_population, \
+                                         source = source, \
+                                         source_url = source_url)
+
+            new_record.add_bed_type(new_type_data.getStructure())
 
         print(f'MI NUEVO REGISTRO ES!!! ')
         print(new_record)
