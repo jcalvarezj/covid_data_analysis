@@ -88,11 +88,6 @@ def process_raw_data(data):
     country_data = data.groupby('country')
 
     for country_name, country_group in country_data:
-        print(country_name)
-        print('--------')
-        print(country_group)
-        print('--------\n\n')
-
         beds_average = country_group['beds'].mean()
         beds_total = country_group['beds'].sum()
         population = country_group['population'].mean()
@@ -111,17 +106,14 @@ def process_raw_data(data):
         
         bed_types_groups = country_group.groupby('type')
 
-        print('Los grupos de tipo son-------------------------')
-
         for type_name, type_group in bed_types_groups:
-            #print(f'{type_name}\n**************\n{type_group}')
-
             type_bed_count = float(type_group['beds'].values[0])
             type_percentage = 100 * type_bed_count / bed_total_count
             type_population = int(type_group['population'].values[0])
             type_estimated = type_population * type_bed_count / 10
             source = type_group['source'].values[0]
             source_url = type_group['source_url'].values[0]
+            year = type_group['year'].values[0]
 
             new_type_data = BedTypesData(type_name = type_name.lower(), \
                                          count = type_bed_count, \
@@ -130,11 +122,12 @@ def process_raw_data(data):
                                              type_estimated, \
                                          population = type_population, \
                                          source = source, \
-                                         source_url = source_url)
+                                         source_url = source_url, \
+                                         year = int(year))
 
             new_record.add_bed_type(new_type_data.getStructure())
 
-        print(f'MI NUEVO REGISTRO ES!!! ')
+        print(f'\nTHE NEW RECORD IS: ')
         print(new_record)
 
         records.append(new_record)

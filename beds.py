@@ -46,7 +46,7 @@ class BedTypesData:
     """
     def __init__(self, type_name=None, count=None, percentage=None,
                  population=None, estimated_for_population=None, source=None,
-                 source_url=None):
+                 source_url=None, year=None):
         self._type_name = type_name
         self._count = count
         self._percentage = percentage
@@ -54,6 +54,7 @@ class BedTypesData:
         self._estimated_for_population = estimated_for_population
         self._source = source
         self._source_url = source_url
+        self._year = year
 
 
     def getStructure(self):
@@ -63,6 +64,7 @@ class BedTypesData:
             'population': self._population,
             'estimatedForPopulation': self._estimated_for_population,
             'source': self._source,
-            'sourceUrl': self._source_url
+            'sourceUrl': self._source_url,
+            'year': self._year
         }
         return structure
