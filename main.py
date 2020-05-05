@@ -82,6 +82,10 @@ def filter_beds(category):
 
 
 def validate_option(option, min_value, max_value):
+    """
+    Validates whether an option number is in the accepted interval (between
+    min_value and max_value)
+    """
     if (option >= min_value and option <= max_value):
         return True
     else:
@@ -90,6 +94,10 @@ def validate_option(option, min_value, max_value):
 
 
 def pack_records(country_data, limit = None):
+    """
+    From a filtered grouped dataframe, return a list of BedsRecords. If a limit
+    is entered, only return the first elements up to one before that limit
+    """
     records = []
     
     for country_name, country_group in country_data:     
@@ -154,7 +162,7 @@ def pack_records(country_data, limit = None):
 
 def process_without_filter(data):
     """
-    Returns the basic structure of the whole dataset as a list of BedsRecords
+    Returns the basic structure of the whole dataset without filter
     """    
     country_data = data.groupby('country')
 
@@ -174,6 +182,9 @@ def process_by_scale_capacity(data, ascending = False):
 
 
 def write_to_file(jsonData, filterIndex):
+    """
+    Writes the entered json into a file named according to the chosen filter
+    """
     name = BedsFilter(filterIndex).name
     filename = BedsFilter.EXPORT_FILENAME.value.replace("#", name)
     try:
@@ -186,6 +197,9 @@ def write_to_file(jsonData, filterIndex):
 
 
 def main():
+    """
+    Program entry point
+    """
     finished = False
     dataset_option = 0
     filter_option = 0
