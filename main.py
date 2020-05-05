@@ -2,6 +2,7 @@ import sys
 import json
 from beds_data import BedsRecord, BedTypesData
 from enum import Enum
+from api import sendBedsData
 import pandas as pd
 import traceback
 
@@ -40,7 +41,10 @@ MENU = [
     (0) Go back''',
     '''\nMeasures dataset chosen. What filter would you like to apply?
 
-    (...) Yet to implement'''
+    (...) Yet to implement''',
+    '''\nDo you want to send the results to the API?
+    Type "yes" if you want to; otherwise, hit the Enter (Return) key
+    '''
 ]
 
 
@@ -204,14 +208,15 @@ def main():
                                 filter_navigation = False
                             else:
                                 records = filter_beds(filter_option)
+                                json_list = [r.toJson() for r in records]
+                                json_data = json.dumps(json_list, indent = 4)
 
-                                jsonList = [r.toJson() for r in records]
+                                write_to_file(json_data, filter_option)
+                                
+                                user_input = prompt_user(MENU[3])
 
-                                write_to_file(json.dumps(jsonList,
-                                                         indent = 4),
-                                              filter_option)
-                                print('\nResults for the chosen filter\n')
-                                print(str(records))
+                                if (user_input.lower() == 'yes'):
+                                    sendBedsData(json_data)
 
                 else:
                     raise Exception("Not implemented yet")
