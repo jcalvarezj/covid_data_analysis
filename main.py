@@ -21,6 +21,7 @@ class BedsFilter(Enum):
     BED_RECORDS_NUMBER = 24
 
 
+TOP_N = 10
 MENU = [
     '''Please enter the desired option: 
 
@@ -63,7 +64,7 @@ def filter_beds(category):
         elif (category == BedsFilter.TOP_COUNTRIES_BY_SCALE.value):
             return process_by_scale_capacity(data)
         elif (category == BedsFilter.BOTTOM_COUNTRIES_BY_SCALE.value):
-            return process_by_scale_capacity(data, False)
+            return process_by_scale_capacity(data, True)
         elif (category == BedsFilter.TOP_COUNTRIES_BY_ESTIMATE.value):
             raise Exception("Not implemented yet")
         elif (category == BedsFilter.BOTTOM_COUNTRIES_BY_ESTIMATE.value):
@@ -84,7 +85,7 @@ def validate_option(option, min_value, max_value):
         return False
 
 
-def pack_records(country_data):
+def pack_records(country_data, limit = None):
     records = []
     
     for country_name, country_group in country_data:     
@@ -141,8 +142,10 @@ def pack_records(country_data):
 
         records.append(new_record)
 
-    return records
-
+    if (limit != None):
+        return records[:limit]
+    else:
+        return records
 
 def process_without_filter(data):
     """
@@ -153,16 +156,16 @@ def process_without_filter(data):
     return(pack_records(country_data))
 
 
-def process_by_scale_capacity(data, descending = True):
+def process_by_scale_capacity(data, ascending = False):
     """
     Filters by the N top or bottom countries by bed count and returns the list
     of the filtered BedsRecords
     """
     data['bedsTotal'] = data.groupby('country')['beds'].transform('sum')
-    sorted_data = data.sort_values(['bedsTotal'], ascending = not descending)
-    country_data = sorted_data.groupby(['bedsTotal','country'])
+    sorted_data = data.sort_values(['bedsTotal'], ascending = ascending)
+    country_data = sorted_data.groupby(['bedsTotal','country'], sort = False)
 
-    return pack_records(country_data)
+    return pack_records(country_data, TOP_N)
 
 
 def main():
@@ -183,7 +186,7 @@ def main():
                     while (filter_navigation):
                         filter_option = int(prompt_user(MENU[1]))
 
-                        if (validate_option(filter_option, 0, 6)):
+                        if (validate_option(filter_option, 0, 5)):
                             if (filter_option == 0):
                                 filter_navigation = False
                             else:
