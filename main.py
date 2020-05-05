@@ -222,7 +222,12 @@ def main():
                                 filter_navigation = False
                             else:
                                 records = filter_beds(filter_option)
+
+                                api_json_list = [json.dumps(r.toJson()) 
+                                                 for r in records]
+
                                 json_list = [r.toJson() for r in records]
+
                                 json_data = json.dumps(json_list, indent = 4)
 
                                 write_to_file(json_data, filter_option)
@@ -230,7 +235,7 @@ def main():
                                 user_input = prompt_user(MENU[3])
 
                                 if (user_input.lower() == 'yes'):
-                                    sendBedsData(json_data)
+                                    sendBedsData(api_json_list)
 
                 else:
                     raise Exception("Not implemented yet")

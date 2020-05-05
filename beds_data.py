@@ -28,15 +28,17 @@ class BedsRecord:
 
     def toJson(self):
         return {
-            'code': self._code,
-            'lat': self._lat,
-            'lng': self._lng,
-            'bedsTotal': self._beds_total,
-            'bedsAverage': self._beds_average,            
-            'populationAverage': self._population_average,
-            'estimatedBedsTotal': self._estimated_beds_total,
-            'estimatedBedsAverage': self._estimated_beds_average,
-            'bedType': self._bed_type
+            'data': {
+                'code': self._code,
+                'lat': self._lat,
+                'lng': self._lng,
+                'bedsTotal': self._beds_total,
+                'bedsAverage': self._beds_average,            
+                'populationAverage': self._population_average,
+                'estimatedBedsTotal': self._estimated_beds_total,
+                'estimatedBedsAverage': self._estimated_beds_average,
+                'bedType': self._bed_type
+            }
         }
 
     
