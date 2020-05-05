@@ -18,8 +18,16 @@ class BedsRecord:
         self._bed_type = []
 
 
-    def __str__(self):
-        structure = {
+    def __str__(self):        
+        return json.dumps(self.toJson(), indent=4)
+
+
+    def __repr__(self):
+        return str(self)
+
+
+    def toJson(self):
+        return {
             'code': self._code,
             'lat': self._lat,
             'lng': self._lng,
@@ -29,12 +37,7 @@ class BedsRecord:
             'estimatedBedsTotal': self._estimated_beds_total,
             'estimatedBedsAverage': self._estimated_beds_average,
             'bedType': self._bed_type
-        }        
-        return json.dumps(structure, indent=4)
-
-
-    def __repr__(self):
-        return str(self)
+        }
 
     
     def add_bed_type(self, bed_type):

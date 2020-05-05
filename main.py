@@ -1,4 +1,5 @@
 import sys
+import json
 from beds_data import BedsRecord, BedTypesData
 from enum import Enum
 import pandas as pd
@@ -18,6 +19,7 @@ class BedsFilter(Enum):
     TOP_COUNTRIES_BY_AVERAGE = 6
     BOTTOM_COUNTRIES_BY_AVERAGE = 7
     BEDS_FILENAME = './data/hospital_beds.csv'
+    EXPORT_FILENAME = './export/#.json'
     BED_RECORDS_NUMBER = 24
 
 
@@ -72,9 +74,7 @@ def filter_beds(category):
         elif (category == BedsFilter.NUMBER_PERCENT_COUNTRY_NORMAL.value):
             raise Exception("Not implemented yet")
     except FileNotFoundError:
-        print(f'The file "{BedsFilter.BEDS_FILENAME.value}" does not exist')
-    except Exception as e:
-        print(e)
+        print(f'The file "{BedsFilter.BEDS_FILENAME.value}" does not exist')    
 
 
 def validate_option(option, min_value, max_value):
@@ -147,6 +147,7 @@ def pack_records(country_data, limit = None):
     else:
         return records
 
+
 def process_without_filter(data):
     """
     Returns the basic structure of the whole dataset as a list of BedsRecords
@@ -166,6 +167,18 @@ def process_by_scale_capacity(data, ascending = False):
     country_data = sorted_data.groupby(['bedsTotal','country'], sort = False)
 
     return pack_records(country_data, TOP_N)
+
+
+def write_to_file(jsonData, filterIndex):
+    name = BedsFilter(filterIndex).name
+    filename = BedsFilter.EXPORT_FILENAME.value.replace("#", name)
+    try:
+        with open(filename, 'w') as export_file:
+            export_file.write(jsonData)
+        print(f'Wrote the results on {filename}!')
+    except OSError as e:
+        print(f'Could not write {filename}!')
+        print(e)
 
 
 def main():
@@ -192,6 +205,11 @@ def main():
                             else:
                                 records = filter_beds(filter_option)
 
+                                jsonList = [r.toJson() for r in records]
+
+                                write_to_file(json.dumps(jsonList,
+                                                         indent = 4),
+                                              filter_option)
                                 print('\nResults for the chosen filter\n')
                                 print(str(records))
 
@@ -199,9 +217,9 @@ def main():
                     raise Exception("Not implemented yet")
         except ValueError:
             print('\nSorry, only numbers are valid! Try again\n')
-        except Exception as e:            
+        except Exception as e:
             traceback.print_exc()
-            sys.exit(f'An error happened! \n {e} \n')
+            sys.exit(f'\nUnexpected error! Exiting.\nThe error: ** {e} ** \n')
 
 
 if __name__ == "__main__":
