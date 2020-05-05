@@ -31,8 +31,8 @@ MENU = [
 
     (1) Number and percentage of beds per type, by country (scale)
     (2) Top 10 countries with higher bed capacity (scale)
-    (3) Top 10 countries with higher bed capacity (estimated total)
-    (4) Top 10 countries with lower bed capacity (scale)
+    (3) Top 10 countries with lower bed capacity (scale)
+    (4) Top 10 countries with higher bed capacity (estimated total)    
     (5) Top 10 countries with lower bed capacity (estimated total)
     (0) Go back''',
     '''\nMeasures dataset chosen. What filter would you like to apply?
@@ -86,14 +86,20 @@ def validate_option(option, min_value, max_value):
 
 def pack_records(country_data):
     records = []
-
-    for country_name, country_group in country_data:
+    
+    for country_name, country_group in country_data:     
         beds_average = country_group['beds'].mean()
         beds_total = country_group['beds'].sum()
         population = country_group['population'].mean()
-        bed_types_list = country_group['beds']        
+        bed_types_list = country_group['beds']
+        iso_code = ""
 
-        new_record = BedsRecord(code = country_name.lower(),
+        if (type(country_name) is tuple):
+            iso_code = country_name[1]
+        else:
+            iso_code = country_name
+
+        new_record = BedsRecord(code = iso_code.lower(),
                                 lat = float(country_group['lat'].values[0]),
                                 lng = float(country_group['lng'].values[0]),
                                 beds_total = float(beds_total),
@@ -130,7 +136,8 @@ def pack_records(country_data):
             types_number += 1
 
         new_record.set_estimated_beds_total(estimated_beds_total)
-        new_record.set_estimated_beds_average(estimated_beds_total, types_number)
+        new_record.set_estimated_beds_average(estimated_beds_total,
+                                              types_number)
 
         records.append(new_record)
 
@@ -151,14 +158,9 @@ def process_by_scale_capacity(data, descending = True):
     Filters by the N top or bottom countries by bed count and returns the list
     of the filtered BedsRecords
     """
-    
-
-    data['bedsAverage'] = data.groupby('country')['beds'].transform('mean')
     data['bedsTotal'] = data.groupby('country')['beds'].transform('sum')
-    data['populationAverage'] = data.groupby('country')['population'].transform('mean')
-    data['populationAverage'] = data.groupby('country')['population'].transform('mean')
-
-    country_data = data.groupby('country')
+    sorted_data = data.sort_values(['bedsTotal'], ascending = not descending)
+    country_data = sorted_data.groupby(['bedsTotal','country'])
 
     return pack_records(country_data)
 
