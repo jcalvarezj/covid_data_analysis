@@ -318,10 +318,10 @@ TW,,,23.5,121.0,ICU,1000HAB,0.285,23589000,2017,ccm-journal,https://www.research
 TZ,,,-6.0,35.0,TOTAL,1000HAB,0.7,44346525,2010,wdi,https://data.worldbank.org/indicator/SH.MED.BEDS.ZS
 UA,,,49.0,32.0,TOTAL,1000HAB,8.8,45489600,2013,wdi,https://data.worldbank.org/indicator/SH.MED.BEDS.ZS
 UG,,,1.0,32.0,TOTAL,1000HAB,0.5,32428167,2010,wdi,https://data.worldbank.org/indicator/SH.MED.BEDS.ZS
-US,,,38.0,-97.0,ACUTE,1000HAB,2.48764,328004407,2019,argis,https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Hospitals_1/FeatureServer/0
-US,,,38.0,-97.0,ICU,1000HAB,0.302904,328004407,2019,argis,https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Hospitals_1/FeatureServer/0
-US,,,38.0,-97.0,OTHER,1000HAB,0.242003,328004407,2019,argis,https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Hospitals_1/FeatureServer/0
-US,,,38.0,-97.0,PSYCHIATRIC,1000HAB,0.21975,328004407,2019,argis,https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Hospitals_1/FeatureServer/0
+US,,,38.0,-97.0,ACUTE,1000HAB,2.48764,328004407,2019,arcgis,https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Hospitals_1/FeatureServer/0
+US,,,38.0,-97.0,ICU,1000HAB,0.302904,328004407,2019,arcgis,https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Hospitals_1/FeatureServer/0
+US,,,38.0,-97.0,OTHER,1000HAB,0.242003,328004407,2019,arcgis,https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Hospitals_1/FeatureServer/0
+US,,,38.0,-97.0,PSYCHIATRIC,1000HAB,0.21975,328004407,2019,arcgis,https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Hospitals_1/FeatureServer/0
 US,,,38.0,-97.0,TOTAL,1000HAB,2.77,322941311,2016,oecd,https://data.oecd.org/healtheqt/hospital-beds.htm
 UY,,,-33.0,-56.0,TOTAL,1000HAB,2.8,3400434,2014,wdi,https://data.worldbank.org/indicator/SH.MED.BEDS.ZS
 UZ,,,41.0,64.0,TOTAL,1000HAB,4.0,30243200,2013,wdi,https://data.worldbank.org/indicator/SH.MED.BEDS.ZS
