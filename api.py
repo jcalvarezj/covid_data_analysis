@@ -22,7 +22,7 @@ def sendBedsData(json_data_list):
         
     for record in json_data_list:
         pending_requests.append(grequests.post(URL, data = record,
-                                                headers = HEADERS))        
+                                               headers = HEADERS))        
 
     print('Going to send the requests')
 

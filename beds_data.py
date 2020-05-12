@@ -19,7 +19,7 @@ class BedsRecord:
 
 
     def __str__(self):        
-        return json.dumps(self.toJson(), indent=4)
+        return json.dumps(self.toJson())
 
 
     def __repr__(self):

@@ -56,14 +56,15 @@ def prompt_user(message):
     return input()
 
 
-def filter_beds(category):
+def filter_beds(category, sampling = False):
     """
     Returns the dataset (pandas.core.frame.DataFrame) filtered by the input
-    filter category
+    filter category. Optionally
     """
     try:
-        data = pd.read_csv(BedsFilter.BEDS_FILENAME.value) \
-                   .head(BedsFilter.BED_RECORDS_NUMBER.value)
+        data = pd.read_csv(BedsFilter.BEDS_FILENAME.value)
+        if sampling:
+            data = data.head(BedsFilter.BED_RECORDS_NUMBER.value)            
         ## TODO: Remove head for processing the full dataset
         if (category == BedsFilter.NUMBER_PERCENT_COUNTRY_NORMAL.value):
             return process_without_filter(data)
