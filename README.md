@@ -36,7 +36,26 @@ This program made in Python is used to filter data from CSV files from two datas
 
 ## Execution
 
-    Use either  `python main.py`  or  `python3 main.py`
+    Use either  `python main.py`  or  `python3 main.py` for a guided Command Line Interface menu, or execute using arguments as follows:
+
+    `python main.py <index of dataset> `
+
+    For the values of datasets:
+
+    1. Bed capacity
+    2. Measures and restrictions
+
+    Bed capacity's filters:
+
+    1. Number and percentage of beds per type, by country (scale)
+    2. Top 10 countries with higher bed capacity (scale)
+    3. Top 10 countries with lower bed capacity (scale)
+    4. Top 10 countries with higher bed capacity (estimated total)    
+    5. Top 10 countries with lower bed capacity (estimated total)
+    
+    Measures and restrictions filters:
+
+    &nbsp;&nbsp;&nbsp;(...) Yet to implement
 
 
 ## Usage
