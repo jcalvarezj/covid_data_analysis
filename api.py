@@ -2,7 +2,8 @@ import grequests
 import json
 
 
-URL = 'https://api-covid-pi.now.sh/bed'
+#URL = 'https://api-covid-pi.now.sh/bed'
+URL = 'https://jsonplaceholder.typicode.com/posts'
 HEADERS = {
     "Content-type": "application/json",
     "Accept": "text/plain"

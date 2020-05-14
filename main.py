@@ -1,10 +1,10 @@
 import sys
 import json
+import pandas as pd
+import traceback
 from datatypes import BedsRecord, BedTypesData
 from enum import Enum
 from api import sendBedsData
-import pandas as pd
-import traceback
 
 
 class BedsFilter(Enum):
@@ -215,60 +215,90 @@ def write_data(general_json, types_json, filterIndex):
     write_to_file(types_json, types_filename)
 
 
-def main():
+def load_records(filter_option, cli_mode = False, send_request = False):
+    records = filter_beds(filter_option)
+
+    general_json_list = [r.to_json()
+                            for r in records[0]]
+    types_json_list = [r.to_json()
+                        for r in records[1]]
+
+    general_data = json.dumps(general_json_list, indent = 4)
+    types_data = json.dumps(types_json_list, indent = 4)
+
+    api_data = [general_data, types_data]
+
+    write_data(general_data, types_data, filter_option)
+
+    if (cli_mode):
+        user_input = prompt_user(MENU[3])
+        answer = user_input.lower() == 'yes'
+        
+        if (answer):
+            sendBedsData(api_data)
+
+    elif (send_request):
+        sendBedsData(api_data)
+
+
+def main_cli():
     """
-    Program entry point
+    Program entry point without execution arguments
     """
     finished = False
     dataset_option = 0
     filter_option = 0
         
     while (not finished):
-        filter_navigation = True
+        filter_navigation = True        
+        dataset_option = int(prompt_user(MENU[0]))
+        
+        if (validate_option(dataset_option, 0, 2)):
+            if (dataset_option == 0):
+                finished = True 
+            elif (dataset_option == 1):
+                while (filter_navigation):
+                    filter_option = int(prompt_user(MENU[1]))
 
-        try:
-            dataset_option = int(prompt_user(MENU[0]))
-            
-            if (validate_option(dataset_option, 0, 2)):
-                if (dataset_option == 0):
-                    finished = True 
-                elif (dataset_option == 1):
-                    while (filter_navigation):
-                        filter_option = int(prompt_user(MENU[1]))
+                    if (validate_option(filter_option, 0, 5)):
+                        if (filter_option == 0):
+                            filter_navigation = False
+                        else:
+                            load_records(filter_option, cli_mode = True)
 
-                        if (validate_option(filter_option, 0, 5)):
-                            if (filter_option == 0):
-                                filter_navigation = False
-                            else:
-                                ## TODO: Change sampling for prod.
-                                records = filter_beds(filter_option, True)
+            else:
+                raise Exception("Not implemented yet")
 
-                                general_json_list = [r.to_json()
-                                                     for r in records[0]]
-                                types_json_list = [r.to_json()
-                                                   for r in records[1]]
 
-                                general_data = json.dumps(general_json_list, indent = 4)
-                                types_data = json.dumps(types_json_list, indent = 4)
+def main_args(send_request = False):
+    """
+    Program entry point with execution arguments
+    """    
+    dataset_option = int(sys.argv[1])
 
-                                api_data = [general_data, types_data]
+    if (validate_option(dataset_option, 1, 2)):
+        if (dataset_option == 1):
+            filter_option = int(sys.argv[2])
 
-                                write_data(general_data, types_data,
-                                           filter_option)
-                                
-                                user_input = prompt_user(MENU[3])
-
-                                if (user_input.lower() == 'yes'):
-                                    sendBedsData(api_data)
-
-                else:
-                    raise Exception("Not implemented yet")
-        except ValueError:
-            print('\nSorry, only numbers are valid! Try again\n')
-        except Exception as e:
-            traceback.print_exc()
-            sys.exit(f'\nUnexpected error! Exiting.\nThe error: ** {e} ** \n')
+            if (validate_option(filter_option, 1, 5)):
+                load_records(filter_option, send_request = send_request)
+        else:
+            raise Exception("Not implemented yet")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        if (len(sys.argv) == 1):
+            main_cli()
+        elif (len(sys.argv) == 3):
+            main_args()
+        elif (len(sys.argv) == 4):
+            main_args(sys.argv[3] == 'post')
+        else:
+            raise Exception('Not enough arguments. Usage: python main.py' \
+            +' <index of dataset> <index of filter>')
+    except ValueError:
+        print('\nSorry, only numbers are valid! Try again\n')
+    except Exception as e:
+        traceback.print_exc()
+        sys.exit(f'\nUnexpected error! Exiting.\nThe error: ** {e} ** \n')
