@@ -50,8 +50,9 @@ Bed capacity's filters:
 1. Number and percentage of beds per type, by country (scale)
 2. Top 10 countries with higher bed capacity (scale)
 3. Top 10 countries with lower bed capacity (scale)
-4. Top 10 countries with higher bed capacity (estimated total)    
-5. Top 10 countries with lower bed capacity (estimated total)
+4. [In progress] Top 10 countries with higher bed capacity (estimated total)    
+5. [In progress] Top 10 countries with lower bed capacity (estimated total)
+6. [In Progress...]
 
 Measures and restrictions filters:
 
