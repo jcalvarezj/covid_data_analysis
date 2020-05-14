@@ -20,8 +20,8 @@ def sendBedsData(json_data_list):
     """
     pending_requests = []
         
-    for record in json_data_list:
-        pending_requests.append(grequests.post(URL, data = record,
+    for json_struct in json_data_list:
+        pending_requests.append(grequests.post(URL, data = json_struct,
                                                headers = HEADERS))        
 
     print('Going to send the requests')
