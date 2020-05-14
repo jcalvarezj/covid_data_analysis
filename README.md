@@ -17,7 +17,7 @@ This program made in Python is used to filter data from CSV files from two datas
 
 - Clone into a new directory and navigate inside it
 
-- Create a new virtual environmente using **viertualenv**
+- Create a new virtual environment using **virtualenv**
 
     For example, `virtualenv venv`
 
