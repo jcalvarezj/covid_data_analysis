@@ -1,6 +1,6 @@
 import sys
 import json
-from bed_types import BedsRecord, BedTypesData
+from datatypes import BedsRecord, BedTypesData
 from enum import Enum
 from api import sendBedsData
 import pandas as pd
