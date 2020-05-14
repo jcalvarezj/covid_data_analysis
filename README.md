@@ -38,8 +38,8 @@ This program made in Python is used to filter data from CSV files from two datas
 
     Use either  `python main.py`  or  `python3 main.py` for a guided Command Line Interface menu, or execute using arguments as follows:
 
-    `python main.py <index of dataset> `
-
+    `python main.py <index of dataset> <index of filter> [post]`
+    
     For the values of datasets:
 
     1. Bed capacity
@@ -56,6 +56,8 @@ This program made in Python is used to filter data from CSV files from two datas
     Measures and restrictions filters:
 
     &nbsp;&nbsp;&nbsp;(...) Yet to implement
+
+    Finally, the optional argument 'post' can be added to send a request to the defined backend API
 
 
 ## Usage
