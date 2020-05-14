@@ -36,30 +36,30 @@ This program made in Python is used to filter data from CSV files from two datas
 
 ## Execution
 
-    Use either  `python main.py`  or  `python3 main.py` for a guided Command Line Interface menu, or execute using arguments as follows:
+Use either  `python main.py`  or  `python3 main.py` for a guided Command Line Interface menu, or execute using arguments as follows:
 
-    `python main.py <index of dataset> <index of filter> [post]`
-    
-    For the values of datasets:
+`python main.py <index of dataset> <index of filter> [post]`
 
-    1. Bed capacity
-    2. Measures and restrictions
+For the values of datasets:
 
-    Bed capacity's filters:
+1. Bed capacity
+2. Measures and restrictions
 
-    1. Number and percentage of beds per type, by country (scale)
-    2. Top 10 countries with higher bed capacity (scale)
-    3. Top 10 countries with lower bed capacity (scale)
-    4. Top 10 countries with higher bed capacity (estimated total)    
-    5. Top 10 countries with lower bed capacity (estimated total)
-    
-    Measures and restrictions filters:
+Bed capacity's filters:
 
-    &nbsp;&nbsp;&nbsp;(...) Yet to implement
+1. Number and percentage of beds per type, by country (scale)
+2. Top 10 countries with higher bed capacity (scale)
+3. Top 10 countries with lower bed capacity (scale)
+4. Top 10 countries with higher bed capacity (estimated total)    
+5. Top 10 countries with lower bed capacity (estimated total)
 
-    Finally, the optional argument 'post' can be added to send a request to the defined backend API
+Measures and restrictions filters:
+
+&nbsp;&nbsp;&nbsp;(...) Yet to implement
+
+Finally, the optional argument 'post' can be added to send a request to the defined backend API
 
 
 ## Usage
 
-    Activate the virtual environment and run the program using a CLI. Follow the instructions that appear on screen
+Activate the virtual environment and run the program using a CLI. Follow the instructions that appear on screen
