@@ -56,7 +56,7 @@ Bed capacity's filters:
 
 Measures and restrictions filters:
 
-&nbsp;&nbsp;&nbsp;(...) Yet to implement
+&nbsp;&nbsp;&nbsp;(...) Yet to be implemented
 
 Finally, the optional argument 'post' can be added to send a request to the defined backend API
 

@@ -13,46 +13,64 @@ class BedsFilter(Enum):
     beds dataset
     """
     NUMBER_PERCENT_COUNTRY_NORMAL = 1
-    TOP_COUNTRIES_BY_SCALE = 2
-    BOTTOM_COUNTRIES_BY_SCALE = 3
-    TOP_COUNTRIES_BY_ESTIMATE = 4
-    BOTTOM_COUNTRIES_BY_ESTIMATE = 5
-    TOP_COUNTRIES_BY_AVERAGE = 6
-    BOTTOM_COUNTRIES_BY_AVERAGE = 7
+    TOP_COUNTRIES_SCALE = 2
+    BOTTOM_COUNTRIES_SCALE = 3
+    TOP_COUNTRIES_ESTIMATE = 4
+    BOTTOM_COUNTRIES_ESTIMATE = 5
+    TOP_COUNTRIES_AVG_SCALE = 6
+    BOTTOM_COUNTRIES_AVG_SCALE = 7
+    TOP_COUNTRIES_AVG_ESTIMATE = 8
+    BOTTOM_COUNTRIES_AVG_ESTIMATE = 9
     BEDS_FILENAME = './data/hospital_beds.csv'
     EXPORT_FILENAME = './export/#.json'
-    BED_RECORDS_NUMBER = 24
+    SAMPLE_RECORDS = 24
 
 
 TOP_N = 10
+BED_FILTERS = [
+    'Number and percentage of beds per type, by country (scale)',
+    'Top 10 countries with higher bed capacity (scale)',
+    'Top 10 countries with lower bed capacity (scale)',
+    'Top 10 countries with higher bed capacity (estimated total)',
+    'Top 10 countries with lower bed capacity (estimated total)',
+    'Top 10 countries with higher average bed capacity (scale)',
+    'Top 10 countries with lower average bed capacity (scale)',
+    'Top 10 countries with higher average bed capacity (estimated total)',
+    'Top 10 countries with lower average bed capacity (estimated total)'
+]
+MEASURE_FILTERS = []  # TODO: Complete filter names for measures dataset
 MENU = [
     '''Please enter the desired option: 
 
     (1) Global bed capacity
     (2) Measures and restrictions by country
     (0) Exit program''',
-    '''\nBeds dataset chosen. What filter would you like to apply?
-
-    (1) Number and percentage of beds per type, by country (scale)
-    (2) Top 10 countries with higher bed capacity (scale)
-    (3) Top 10 countries with lower bed capacity (scale)
-    (4) Top 10 countries with higher bed capacity (estimated total)    
-    (5) Top 10 countries with lower bed capacity (estimated total)
-    (0) Go back''',
+    '''\nBeds dataset chosen. What filter would you like to apply?\n''',
     '''\nMeasures dataset chosen. What filter would you like to apply?
 
     (...) Yet to implement''',
     '''\nDo you want to send the results to the API?
-    Type "yes" if you want to; otherwise, hit the Enter (Return) key
-    '''
+    Type "yes" if you want to; otherwise, hit the Enter (Return) key\n'''
 ]
 
 
-def prompt_user(message):
+def print_filters(filters):
+    count = 1
+    for f in filters:
+        print(f'({count}) {f}')
+        count += 1
+    print('(0) Go back\n')
+
+
+def prompt_user(message_index):
     """
     Prompts the user with a message to input data and returns it
     """
-    print(message)
+    print(MENU[message_index])
+    if (message_index == 1):
+        print_filters(BED_FILTERS)
+    elif (message_index == 2):
+        print_filters(MEASURE_FILTERS)
     return input()
 
 
@@ -61,7 +79,6 @@ def process_without_filter(data):
     Returns the basic structure of the whole dataset without filter    
     """    
     country_gb = data.groupby('country')
-
     return(pack_records(country_gb))
 
 
@@ -70,7 +87,7 @@ def process_by_scale_capacity(data, ascending = False):
     Filters by the N top or bottom countries by bed count and returns the list
     of filtered BedsRecords
     Precondition: The beds_total column has been added to the dataframe
-    """    
+    """
     sorted_data = data.sort_values(['beds_total'], ascending = ascending)
     country_gb = sorted_data.groupby(['beds_total','country'], sort = False)
 
@@ -97,7 +114,7 @@ def filter_beds(category, sampling = False):
     Returns the dataset (pandas.core.frame.DataFrame) filtered by the input
     filter category. If the sampling parameter is set to true, only a number
     of records will be taken from the dataset according to the value of the
-    BedsFilter.BED_RECORDS_NUMBER constant
+    BedsFilter.SAMPLE_RECORDS constant
     The returned structure is a list with three elements:
     [0]: General structure for country information
     [1]: Information for bed types
@@ -106,7 +123,7 @@ def filter_beds(category, sampling = False):
         data = pd.read_csv(BedsFilter.BEDS_FILENAME.value)
 
         if sampling:
-            data = data.head(BedsFilter.BED_RECORDS_NUMBER.value)
+            data = data.head(BedsFilter.SAMPLE_RECORDS.value)
 
         data['estimated_beds'] = data['population'] * data['beds'] / 10
         data['estimated_beds_total'] = data.groupby('country') \
@@ -123,18 +140,30 @@ def filter_beds(category, sampling = False):
         
         if (category == BedsFilter.NUMBER_PERCENT_COUNTRY_NORMAL.value):
             return process_without_filter(data)
-        elif (category == BedsFilter.TOP_COUNTRIES_BY_SCALE.value):
+        elif (category == BedsFilter.TOP_COUNTRIES_SCALE.value):
             return process_by_scale_capacity(data)
-        elif (category == BedsFilter.BOTTOM_COUNTRIES_BY_SCALE.value):
+        elif (category == BedsFilter.BOTTOM_COUNTRIES_SCALE.value):
             return process_by_scale_capacity(data, True)
-        elif (category == BedsFilter.TOP_COUNTRIES_BY_ESTIMATE.value):            
+        elif (category == BedsFilter.TOP_COUNTRIES_ESTIMATE.value):
             return process_by_estimated_capacity(data)
-        elif (category == BedsFilter.BOTTOM_COUNTRIES_BY_ESTIMATE.value):            
+        elif (category == BedsFilter.BOTTOM_COUNTRIES_ESTIMATE.value):
             return process_by_estimated_capacity(data, True)
-        elif (category == BedsFilter.NUMBER_PERCENT_COUNTRY_NORMAL.value):
+        elif (category == BedsFilter.TOP_COUNTRIES_AVG_SCALE.value):
+            raise Exception("Not implemented yet")
+            #return process_by_average_scale_capacity(data) ## TODO
+        elif (category == BedsFilter.BOTTOM_COUNTRIES_AVG_SCALE.value):
+            raise Exception("Not implemented yet")
+            #return process_by_average_scale_capacity(data, True) ## TODO
+        elif (category == BedsFilter.TOP_COUNTRIES_AVG_ESTIMATE.value):
+            raise Exception("Not implemented yet")
+            #return process_by_average_estimated_capacity(data) ## TODO
+        elif (category == BedsFilter.BOTTOM_COUNTRIES_AVG_ESTIMATE.value):
+            raise Exception("Not implemented yet")
+            #return process_by_average_estimated_capacity(data, True) ## TODO
+        else:
             raise Exception("Not implemented yet")
     except FileNotFoundError:
-        print(f'The file "{BedsFilter.BEDS_FILENAME.value}" does not exist')    
+        print(f'The file "{BedsFilter.BEDS_FILENAME.value}" does not exist')
 
 
 def validate_option(option, min_value, max_value):
@@ -264,9 +293,9 @@ def load_records(filter_option, cli_mode = False, send_request = False):
     write_data(general_data, types_data, filter_option)
 
     if (cli_mode):
-        user_input = prompt_user(MENU[3])
+        user_input = prompt_user(3)
         answer = user_input.lower() == 'yes'
-        
+
         if (answer):
             sendBedsData(api_data)
 
@@ -281,19 +310,19 @@ def main_cli():
     finished = False
     dataset_option = 0
     filter_option = 0
-        
+
     while (not finished):
         filter_navigation = True        
-        dataset_option = int(prompt_user(MENU[0]))
-        
+        dataset_option = int(prompt_user(0))
+
         if (validate_option(dataset_option, 0, 2)):
             if (dataset_option == 0):
                 finished = True 
             elif (dataset_option == 1):
                 while (filter_navigation):
-                    filter_option = int(prompt_user(MENU[1]))
+                    filter_option = int(prompt_user(1))
 
-                    if (validate_option(filter_option, 0, 5)):
+                    if (validate_option(filter_option, 0, len(BED_FILTERS))):
                         if (filter_option == 0):
                             filter_navigation = False
                         else:
