@@ -6,6 +6,7 @@ class BedsRecord:
     """
     def __init__(self, code = None, lat = None, lng = None,
                  beds_average = None, beds_total = None,
+                 estimated_beds_total = None, estimated_beds_average = None,
                  population_average = None):
         self._code = code
         self._lat = lat
@@ -13,8 +14,8 @@ class BedsRecord:
         self._beds_average = beds_average
         self._beds_total = beds_total
         self._population_average = population_average
-        self._estimated_beds_total = None
-        self._estimated_beds_average = None
+        self._estimated_beds_total = estimated_beds_total
+        self._estimated_beds_average = estimated_beds_average
 
 
     def __str__(self):
@@ -39,10 +40,6 @@ class BedsRecord:
             'estimatedBedsTotal': self._estimated_beds_total,
             'estimatedBedsAverage': self._estimated_beds_average
         }
-
-
-    def set_estimated_beds_total(self, estimated_beds_total):
-        self._estimated_beds_total = estimated_beds_total
 
 
     def set_estimated_beds_average(self, estimated_beds_average, types_number):
