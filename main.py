@@ -213,9 +213,6 @@ def pack_records(country_gb, limit = None):
             type_records.append(new_type_data)
 
         country_records.append(new_record)
-
-    if (limit != None):
-        country_records = country_records[:limit]
     
     return [country_records, type_records]
 
