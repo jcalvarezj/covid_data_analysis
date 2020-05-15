@@ -52,7 +52,11 @@ Bed capacity's filters:
 3. Top 10 countries with lower bed capacity (scale)
 4. Top 10 countries with higher bed capacity (estimated total)    
 5. Top 10 countries with lower bed capacity (estimated total)
-6. [In Progress...]
+6. Top 10 countries with higher average bed capacity (scale)
+7. Top 10 countries with lower average bed capacity (scale)
+8. Top 10 countries with higher average bed capacity (estimated)
+9. Top 10 countries with lower average bed capacity (estimated)
+10. [In Progress...]
 
 Measures and restrictions filters:
 

@@ -57,9 +57,9 @@ MENU = [
 def print_filters(filters):
     count = 1
     for f in filters:
-        print(f'({count}) {f}')
+        print(f'    ({count}) {f}')
         count += 1
-    print('(0) Go back\n')
+    print('    (0) Go back\n')
 
 
 def prompt_user(message_index):
@@ -109,6 +109,36 @@ def process_by_estimated_capacity(data, ascending = False):
     return pack_records(country_gb, TOP_N)
 
 
+def process_by_average_scale_capacity(data, ascending = False):
+    """
+    Filters by the N top or bottom countries by bed estimate and returns the
+    list of filtered BedsRecords
+    Precondition: The beds_average column has been added to the
+    dataframe
+    """
+    sorted_data = data.sort_values(['beds_average'], 
+                                   ascending = ascending)
+    country_gb = sorted_data.groupby(['beds_average','country'],
+                                     sort = False)
+
+    return pack_records(country_gb, TOP_N)
+
+
+def process_by_average_estimated_capacity(data, ascending = False):
+    """
+    Filters by the N top or bottom countries by bed estimate and returns the
+    list of filtered BedsRecords
+    Precondition: The estimated_beds_average column has been added to the
+    dataframe
+    """
+    sorted_data = data.sort_values(['estimated_beds_average'], 
+                                   ascending = ascending)
+    country_gb = sorted_data.groupby(['estimated_beds_average','country'],
+                                     sort = False)
+
+    return pack_records(country_gb, TOP_N)
+
+
 def filter_beds(category, sampling = False):
     """
     Returns the dataset (pandas.core.frame.DataFrame) filtered by the input
@@ -149,17 +179,13 @@ def filter_beds(category, sampling = False):
         elif (category == BedsFilter.BOTTOM_COUNTRIES_ESTIMATE.value):
             return process_by_estimated_capacity(data, True)
         elif (category == BedsFilter.TOP_COUNTRIES_AVG_SCALE.value):
-            raise Exception("Not implemented yet")
-            #return process_by_average_scale_capacity(data) ## TODO
+            return process_by_average_scale_capacity(data)
         elif (category == BedsFilter.BOTTOM_COUNTRIES_AVG_SCALE.value):
-            raise Exception("Not implemented yet")
-            #return process_by_average_scale_capacity(data, True) ## TODO
+            return process_by_average_scale_capacity(data, True)
         elif (category == BedsFilter.TOP_COUNTRIES_AVG_ESTIMATE.value):
-            raise Exception("Not implemented yet")
-            #return process_by_average_estimated_capacity(data) ## TODO
+            return process_by_average_estimated_capacity(data)
         elif (category == BedsFilter.BOTTOM_COUNTRIES_AVG_ESTIMATE.value):
-            raise Exception("Not implemented yet")
-            #return process_by_average_estimated_capacity(data, True) ## TODO
+            return process_by_average_estimated_capacity(data, True)
         else:
             raise Exception("Not implemented yet")
     except FileNotFoundError:
