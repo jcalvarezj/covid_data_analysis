@@ -48,14 +48,14 @@ For the values of datasets:
 Bed capacity's filters:
 
 1. Number and percentage of beds per type, by country (scale)
-2. Top 10 countries with higher bed capacity (scale)
-3. Top 10 countries with lower bed capacity (scale)
-4. Top 10 countries with higher bed capacity (estimated total)    
-5. Top 10 countries with lower bed capacity (estimated total)
-6. Top 10 countries with higher average bed capacity (scale)
-7. Top 10 countries with lower average bed capacity (scale)
-8. Top 10 countries with higher average bed capacity (estimated)
-9. Top 10 countries with lower average bed capacity (estimated)
+2. Top 10 countries with highest bed capacity (scale)
+3. Top 10 countries with lowest bed capacity (scale)
+4. Top 10 countries with highest bed capacity (estimated total)    
+5. Top 10 countries with lowest bed capacity (estimated total)
+6. Top 10 countries with highest average bed capacity (scale)
+7. Top 10 countries with lowest average bed capacity (scale)
+8. Top 10 countries with highest average bed capacity (estimated)
+9. Top 10 countries with lowest average bed capacity (estimated)
 10. General dataset statistics
 
 Measures and restrictions filters:

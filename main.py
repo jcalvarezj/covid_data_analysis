@@ -31,17 +31,19 @@ class BedsFilter(Enum):
 TOP_N = 10
 BED_FILTERS = [
     'Number and percentage of beds per type, by country (scale)',
-    'Top 10 countries with higher bed capacity (scale)',
-    'Top 10 countries with lower bed capacity (scale)',
-    'Top 10 countries with higher bed capacity (estimated total)',
-    'Top 10 countries with lower bed capacity (estimated total)',
-    'Top 10 countries with higher average bed capacity (scale)',
-    'Top 10 countries with lower average bed capacity (scale)',
-    'Top 10 countries with higher average bed capacity (estimated total)',
-    'Top 10 countries with lower average bed capacity (estimated total)',
+    'Top 10 countries with highest bed capacity (scale)',
+    'Top 10 countries with lowest bed capacity (scale)',
+    'Top 10 countries with highest bed capacity (estimated total)',
+    'Top 10 countries with lowest bed capacity (estimated total)',
+    'Top 10 countries with highest average bed capacity (scale)',
+    'Top 10 countries with lowest average bed capacity (scale)',
+    'Top 10 countries with highest average bed capacity (estimated total)',
+    'Top 10 countries with lowest average bed capacity (estimated total)',
     'General dataset statistics'
 ]
-MEASURE_FILTERS = []  # TODO: Complete filter names for measures dataset
+MEASURE_FILTERS = [
+    'Number and'
+]
 MENU = [
     '''Please enter the desired option: 
 
@@ -414,7 +416,7 @@ def main_args(send_request = False):
             raise Exception("Not implemented yet")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     try:
         if (len(sys.argv) == 1):
             main_cli()
