@@ -42,16 +42,9 @@ class BedsRecord:
         }
 
 
-    def set_estimated_beds_average(self, estimated_beds_average, types_number):
-        if (types_number != 0):
-            self._estimated_beds_average = estimated_beds_average/types_number
-        else:
-            self._estimated_beds_average = None
-
-
 class BedTypesData:
     """
-    This class represents an object of bed types
+    This class represents a bed type information object
     """
     def __init__(self, code = None, type_name = None, count = None,
                  percentage = None, population = None,
@@ -68,7 +61,7 @@ class BedTypesData:
         self._year = year
 
 
-    def __str__(self):        
+    def __str__(self):
         return json.dumps(self.to_json())
 
 
@@ -93,6 +86,67 @@ class BedTypesData:
         }
 
 
+class BedsGeneralData:
+    """
+    This class represents the object that stores general beds statistics
+    """
+    def __init__(self, beds_count = None, beds_average = None, 
+                 beds_stantard_deviation = None, sources_count = None):
+        self._beds_count = beds_count
+        self._beds_average = beds_average
+        self._beds_stantard_deviation = beds_stantard_deviation
+        self._sources_count = sources_count
+
+
+    def __str__(self):
+        return json.dumps(self.to_json())
+
+
+    def __repr__(self):
+        return str(self)
+
+
+    def to_json(self):
+        return {
+            'bedCount': self._beds_count,
+            "bedAverage": self._beds_average,
+            "bedStandardDeviation": self._beds_stantard_deviation,
+            "sourcesCount": self._sources_count
+        }
+
+
+class BedTypesGeneralData:
+    """
+    This class represents the object that stores general bed types statistics
+    """
+    def __init__(self, type_name = None, count = None, percentage = None,
+                  average = None, standard_deviation = None):
+        self._type_name = type_name
+        self._count = count
+        self._percentage = percentage
+        self._average = average
+        self._standard_deviation = standard_deviation
+
+
+    def __str__(self):
+        return json.dumps(self.to_json())
+
+
+    def __repr__(self):
+        return str(self)
+
+
+    def to_json(self):
+        return {
+            "type": self._type_name,
+            "count": self._count,
+            "percentage": self._percentage,
+            "average": self._average,
+            "standardDeviation": self._standard_deviation
+        }
+
+
+
 class MeasuresData:
     """
     This class represents an object of measures and restrictions information
@@ -114,7 +168,7 @@ class MeasuresData:
         self._target_state = target_state
 
 
-    def __str__(self):        
+    def __str__(self):
         return json.dumps(self.to_json())
 
 
@@ -123,4 +177,7 @@ class MeasuresData:
 
 
     def to_json(self):
+        """
+        Returns the json representation of the MeasuresData instance
+        """
         return dict(self)

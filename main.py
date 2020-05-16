@@ -1,10 +1,11 @@
 import sys
 import json
-import pandas as pd
 import traceback
-from datatypes import BedsRecord, BedTypesData
+import pandas as pd
 from enum import Enum
 from api import sendBedsData
+from datatypes import BedTypesGeneralData
+from datatypes import BedsRecord, BedTypesData, BedsGeneralData
 
 
 class BedsFilter(Enum):
@@ -21,6 +22,7 @@ class BedsFilter(Enum):
     BOTTOM_COUNTRIES_AVG_SCALE = 7
     TOP_COUNTRIES_AVG_ESTIMATE = 8
     BOTTOM_COUNTRIES_AVG_ESTIMATE = 9
+    GENERAL_STATISTICS = 10
     BEDS_FILENAME = './data/hospital_beds.csv'
     EXPORT_FILENAME = './export/#.json'
     SAMPLE_RECORDS = 24
@@ -36,7 +38,8 @@ BED_FILTERS = [
     'Top 10 countries with higher average bed capacity (scale)',
     'Top 10 countries with lower average bed capacity (scale)',
     'Top 10 countries with higher average bed capacity (estimated total)',
-    'Top 10 countries with lower average bed capacity (estimated total)'
+    'Top 10 countries with lower average bed capacity (estimated total)',
+    'General dataset statistics'
 ]
 MEASURE_FILTERS = []  # TODO: Complete filter names for measures dataset
 MENU = [
@@ -55,6 +58,9 @@ MENU = [
 
 
 def print_filters(filters):
+    """
+    Prints the filters as menu options on the CLI
+    """
     count = 1
     for f in filters:
         print(f'    ({count}) {f}')
@@ -139,13 +145,44 @@ def process_by_average_estimated_capacity(data, ascending = False):
     return pack_records(country_gb, TOP_N)
 
 
+def compute_general_statistics(beds_df):
+    beds_total = float(beds_df['beds_total'].sum())
+    beds_average = float(beds_df['beds_total'].mean())
+    beds_std = float(beds_df['beds_total'].std())
+    raw_sources_count = dict(beds_df['source'].value_counts())
+
+    sources_count = {source: int(count) for source, count
+                     in raw_sources_count.items()}
+    
+    general_data = BedsGeneralData(beds_total, beds_average, beds_std,
+                                   sources_count)
+
+    types_data = []
+
+    types_gb = beds_df.groupby('type')
+
+    for type_name, type_group in types_gb:
+        type_count = float(type_group['beds'].sum())
+        type_percentage = float(type_count / beds_total * 100)
+        type_average = float(type_group['beds'].mean())
+        type_std = float(type_group['beds'].std())
+
+        types_record = BedTypesGeneralData(type_name, type_count,
+                                           type_percentage, type_average,
+                                           type_std)
+
+        types_data.append(types_record)
+    
+    return [general_data, types_data]
+
+
 def filter_beds(category, sampling = False):
     """
     Returns the dataset (pandas.core.frame.DataFrame) filtered by the input
     filter category. If the sampling parameter is set to true, only a number
     of records will be taken from the dataset according to the value of the
     BedsFilter.SAMPLE_RECORDS constant
-    The returned structure is a list with three elements:
+    The returned structure is a list with two elements:
     [0]: General structure for country information
     [1]: Information for bed types
     """
@@ -187,7 +224,7 @@ def filter_beds(category, sampling = False):
         elif (category == BedsFilter.BOTTOM_COUNTRIES_AVG_ESTIMATE.value):
             return process_by_average_estimated_capacity(data, True)
         else:
-            raise Exception("Not implemented yet")
+            return compute_general_statistics(data)
     except FileNotFoundError:
         print(f'The file "{BedsFilter.BEDS_FILENAME.value}" does not exist')
 
@@ -216,7 +253,7 @@ def pack_records(country_gb, limit = None):
     result = []
 
     country_records = []
-    type_records = []
+    type_data = []
     
     for country_name, country_group in [g for g in list(country_gb)[:limit]]:
         beds_average = country_group['beds_average'].values[0]
@@ -265,14 +302,17 @@ def pack_records(country_gb, limit = None):
                                          source_url = source_url,
                                          year = int(year))
 
-            type_records.append(new_type_data)
+            type_data.append(new_type_data)
 
         country_records.append(new_record)
     
-    return [country_records, type_records]
+    return [country_records, type_data]
 
 
 def write_to_file(data, filename):
+    """
+    Writes data on the file with specified name
+    """
     try:
         with open(filename, 'w') as export_file:
             export_file.write(data)
@@ -305,9 +345,11 @@ def load_records(filter_option, cli_mode = False, send_request = False):
     through the send_request parameter
     """
     records = filter_beds(filter_option)
+    
+    general_json_list = records[0].to_json() \
+        if (filter_option == BedsFilter.GENERAL_STATISTICS.value) \
+        else [r.to_json() for r in records[0]]
 
-    general_json_list = [r.to_json()
-                            for r in records[0]]
     types_json_list = [r.to_json()
                         for r in records[1]]
 
@@ -324,7 +366,6 @@ def load_records(filter_option, cli_mode = False, send_request = False):
 
         if (answer):
             sendBedsData(api_data)
-
     elif (send_request):
         sendBedsData(api_data)
 
@@ -383,8 +424,8 @@ if __name__ == "__main__":
             main_args(sys.argv[3] == 'post')
         else:
             raise Exception('Not enough arguments. Usage: python main.py' \
-            +' <index of dataset> <index of filter>')
-    except ValueError:
+                +' <index of dataset> <index of filter>')
+    except ValueError:        
         print('\nSorry, only numbers are valid! Try again\n')
     except Exception as e:
         traceback.print_exc()
