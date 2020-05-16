@@ -67,4 +67,4 @@ Finally, the optional argument 'post' can be added to send a request to the defi
 
 ## Usage
 
-Activate the virtual environment and run the program using a CLI. Follow the instructions that appear on screen
+Activate the virtual environment and run the program using a CLI. Follow the instructions that appear on screen (only shown in argumentless CLI mode)
