@@ -68,3 +68,13 @@ Finally, the optional argument 'post' can be added to send a request to the defi
 ## Usage
 
 Activate the virtual environment and run the program using a CLI. Follow the instructions that appear on screen (only shown in argumentless CLI mode)
+
+You will find the generated JSON files in the **export** folder
+
+### Bed Capacity Dataset
+
+The generated output files are named with the **_GENERAL** and **_TYPES** suffixes to indicate whether they refer to general information or specific bed types information. The file name prefixes are the respective filters.
+
+### Measures/Restrictions Dataset
+
+[... Work in progress]

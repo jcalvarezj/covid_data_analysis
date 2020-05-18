@@ -1,3 +1,7 @@
+"""
+This module defines the data types used in the application to store data
+"""
+
 import json
 
 class BedsRecord:

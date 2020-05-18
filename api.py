@@ -1,6 +1,10 @@
+"""
+This module allows communication with the backend's API through POST requests
+with information of the datasets
+"""
+
 import grequests
 import json
-
 
 URL = 'https://api-covid-pi.now.sh/bed'
 HEADERS = {
@@ -14,7 +18,7 @@ def handle_exception(request, exception):
     print(exception)
 
 
-def sendBedsData(json_data_list):
+def send_beds_data(json_data_list):
     """
     Attempts to send a POST request to the Bed endpoint
     """
@@ -39,3 +43,7 @@ def sendBedsData(json_data_list):
             print(f'Problem with the request. Response #{index}:')
             print(response.status_code)
             print(response.json())
+
+
+def send_measures_data(json_data_list):
+    raise Exception("Not implemented yet")
