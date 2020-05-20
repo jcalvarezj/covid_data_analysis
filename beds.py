@@ -13,7 +13,7 @@ from datatypes import (BedsRecord, BedTypesData, BedsGeneralData,
                        BedTypesGeneralData)
 
 
-def _pack_records(country_gb):
+def _pack_records(country_gb, limit = None):
     """
     From a filtered grouped dataframe, returns a list of BedsRecords and
     BedsTypesData objects
@@ -24,7 +24,7 @@ def _pack_records(country_gb):
     country_records = []
     type_data = []
 
-    for country_name, country_group in country_gb:
+    for country_name, country_group in list(country_gb)[:limit]:
         beds_average = country_group['beds_average'].values[0]
         beds_total = country_group['beds_total'].values[0]
         population = country_group['population_average'].values[0]
