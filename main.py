@@ -6,7 +6,6 @@ import sys
 import beds
 import traceback
 import measures as msrs
-from api import send_beds_data
 from commons import prompt_user
 from constants import MENU, BED_FILTERS, MEASURE_FILTERS
 
@@ -49,18 +48,16 @@ def main_cli():
                             beds.load_bed_records(filter_option,
                                                   cli_mode = True)
             else:
-                raise Exception("Work in Progress")
-                # TODO: Implement
-                # while (filter_navigation):
-                #     filter_option = int(prompt_user(2))
+                while (filter_navigation):
+                    filter_option = int(prompt_user(2))
 
-                #     if (validate_option(filter_option, 0, 
-                #                         len(MEASURE_FILTERS))):
-                #         if (filter_option == 0):
-                #             filter_navigation = False
-                #         else:
-                #             msrs.load_measure_records(filter_option,
-                #                                       cli_mode = True)
+                    if (validate_option(filter_option, 0, 
+                                        len(MEASURE_FILTERS))):
+                        if (filter_option == 0):
+                            filter_navigation = False
+                        else:
+                            msrs.load_measure_records(filter_option,
+                                                      cli_mode = True)
 
 
 def main_args(send_request = False):
@@ -77,13 +74,11 @@ def main_args(send_request = False):
                 beds.load_bed_records(filter_option,
                                       send_request = send_request)
         else:
-            raise Exception("Work in Progress")
-            # TODO: Implement
-            # filter_option = int(sys.argv[2])
+            filter_option = int(sys.argv[2])
 
-            # if (validate_option(filter_option, 1, len(MEASURE_FILTERS))):
-            #     msrs.load_measure_records(filter_option,
-            #                               send_request = send_request)
+            if (validate_option(filter_option, 1, len(MEASURE_FILTERS))):
+                msrs.load_measure_records(filter_option,
+                                          send_request = send_request)
 
 
 if __name__ == '__main__':

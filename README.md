@@ -40,12 +40,12 @@ Use either  `python main.py`  or  `python3 main.py` for a guided Command Line In
 
 `python main.py <index of dataset> <index of filter> [post]`
 
-For the values of datasets:
+**For the values of datasets:**
 
 1. Bed capacity
 2. Measures and restrictions
 
-Bed capacity's filters:
+**Bed capacity's filters:**
 
 1. Number and percentage of beds per type, by country (scale)
 2. Top 10 countries with highest bed capacity (scale)
@@ -58,9 +58,10 @@ Bed capacity's filters:
 9. Top 10 countries with lowest average bed capacity (estimated)
 10. General dataset statistics
 
-Measures and restrictions filters:
+**Measures and restrictions filters:**
 
-&nbsp;&nbsp;&nbsp;(...) Yet to be implemented
+1. General measures information by country
+
 
 Finally, the optional argument 'post' can be added to send a request to the defined backend API
 
@@ -73,8 +74,8 @@ You will find the generated JSON files in the **export** folder
 
 ### Bed Capacity Dataset
 
-The generated output files are named with the **_GENERAL** and **_TYPES** suffixes to indicate whether they refer to general information or specific bed types information. The file name prefixes are the respective filters.
+The generated output files are stored in ./export/beds/. These files are named with the **_GENERAL** and **_TYPES** suffixes to indicate whether they refer to general information or specific bed types information. The file name prefixes are the respective filters.
 
 ### Measures/Restrictions Dataset
 
-[... Work in progress]
+Same as above, but stored in ./export/measures/ and with the **_GENERAL** and **_MEASURES** suffixes

@@ -4,6 +4,7 @@ This module defines the data types used in the application to store data
 
 import json
 
+
 class BedsRecord:
     """
     This class represents a record from the beds capacity dataset
@@ -113,9 +114,9 @@ class BedsGeneralData:
     def to_json(self):
         return {
             'bedCount': self._beds_count,
-            "bedAverage": self._beds_average,
-            "bedStandardDeviation": self._beds_stantard_deviation,
-            "sourcesCount": self._sources_count
+            'bedAverage': self._beds_average,
+            'bedStandardDeviation': self._beds_stantard_deviation,
+            'sourcesCount': self._sources_count
         }
 
 
@@ -142,34 +143,24 @@ class BedTypesGeneralData:
 
     def to_json(self):
         return {
-            "type": self._type_name,
-            "count": self._count,
-            "percentage": self._percentage,
-            "average": self._average,
-            "standardDeviation": self._standard_deviation
+            'type': self._type_name,
+            'count': self._count,
+            'percentage': self._percentage,
+            'average': self._average,
+            'standardDeviation': self._standard_deviation
         }
 
 
-
-class MeasuresData:
+class MeasuresGroupData:
     """
-    This class represents an object of measures and restrictions information
+    This class represents general measures and restrictions information
     """
-    def __init__(self, code = None, date_start = None, date_end = None,
-                 description = None, keywords = None, exceptions = None,
-                 quantity = None, target_city = None, target_country = None,
-                 target_region = None, target_state = None):
+    def __init__(self, code = None, keywords_count = None,
+                 sources_count = None, target_countries = None,
+                 target_regions = None, target_states = None):
         self._code = code
-        self._date_start = date_start
-        self._date_end = date_end
-        self._description = description
-        self._keywords = keywords
-        self._exceptions = exceptions
-        self._quantity = quantity
-        self._target_city = target_city
-        self._target_country = target_country
-        self._target_region = target_region
-        self._target_state = target_state
+        self._keywords_count = keywords_count
+        self._sources_count = sources_count        
 
 
     def __str__(self):
@@ -184,4 +175,58 @@ class MeasuresData:
         """
         Returns the json representation of the MeasuresData instance
         """
-        return dict(self)
+        return {
+            'code': self._code,
+            'keywordsCount': self._keywords_count,
+            'sourcesCount': self._sources_count
+        }
+
+
+class MeasuresData:
+    """
+    This class represents an object of measures and restrictions information
+    """
+    def __init__(self, code = None, date_start = None, date_end = None,
+                 description = None, keywords = None, exceptions = None,
+                 quantity = None, implementing_cities = None,
+                 implementing_states = None, target_countries = None,
+                 target_regions = None, source = None):
+        self._code = code
+        self._date_start = date_start
+        self._date_end = date_end
+        self._description = description
+        self._keywords = keywords
+        self._exceptions = exceptions
+        self._quantity = quantity
+        self._implementing_cities = implementing_cities
+        self._implementing_states = implementing_states
+        self._target_countries = target_countries
+        self._target_regions = target_regions
+        self._source = source
+
+
+    def __str__(self):
+        return json.dumps(self.to_json())
+
+
+    def __repr__(self):
+        return str(self)
+
+
+    def to_json(self):
+        """
+        Returns the json representation of the MeasuresData instance
+        """
+        return {
+            'code': self._code,
+            'dateStart': self._date_start,
+            'dateEnd': self._date_end,
+            'description': self._description,
+            'keywords': self._keywords,
+            'exceptions': self._exceptions,
+            'quantity': self._quantity,
+            'implementingCities': self._implementing_cities,
+            'implementingStates': self._implementing_states,
+            'targetCountries': self._target_countries,
+            'targetRegions': self._target_regions
+        }

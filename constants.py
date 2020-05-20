@@ -38,7 +38,7 @@ class MeasuresFilter(Enum):
     ## TODO: Add more filter options
     DATA_FILENAME = './data/measures.csv'
     EXPORT_FILENAME = './export/measures/#.json'
-    SAMPLE_RECORDS = 24
+    SAMPLE_RECORDS = 56
 
 
 TOP_N = 10
@@ -67,9 +67,7 @@ MENU = [
     (2) Measures and restrictions by country
     (0) Exit program''',
     '''\nBeds dataset chosen. What filter would you like to apply?\n''',
-    '''\nMeasures dataset chosen. What filter would you like to apply?
-
-    (...) Yet to implement''',
+    '''\nMeasures dataset chosen. What filter would you like to apply?\n''',
     '''\nDo you want to send the results to the API?
     Type "yes" if you want to; otherwise, hit the Enter (Return) key\n'''
 ]

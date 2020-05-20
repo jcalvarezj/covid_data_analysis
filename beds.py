@@ -2,6 +2,7 @@
 This module contains functions for processing the bed capacity dataset
 """
 
+import sys
 import api
 import json
 import pandas as pd
@@ -12,145 +13,18 @@ from datatypes import (BedsRecord, BedTypesData, BedsGeneralData,
                        BedTypesGeneralData)
 
 
-def process_without_filter(data):
+def _pack_records(country_gb):
     """
-    Returns the basic structure of the whole dataset without filter
-    """
-    country_gb = data.groupby('country')
-    return(pack_records(country_gb))
-
-
-def process_by_scale_capacity(data, ascending = False):
-    """
-    Filters by the N top or bottom countries by bed count and returns the list
-    of filtered BedsRecords
-    Precondition: The beds_total column has been added to the dataframe
-    """
-    sorted_data = data.sort_values(['beds_total'], ascending = ascending)
-    country_gb = sorted_data.groupby(['beds_total','country'], sort = False)
-
-    return pack_records(country_gb, TOP_N)
-
-
-def process_by_estimated_capacity(data, ascending = False):
-    """
-    Filters by the N top or bottom countries by bed estimate and returns the
-    list of filtered BedsRecords
-    Precondition: The estimated_beds_total column has been added to the
-    dataframe
-    """
-    sorted_data = data.sort_values(['estimated_beds_total'], 
-                                   ascending = ascending)
-    country_gb = sorted_data.groupby(['estimated_beds_total','country'],
-                                     sort = False)
-
-    return pack_records(country_gb, TOP_N)
-
-
-def process_by_average_scale_capacity(data, ascending = False):
-    """
-    Filters by the N top or bottom countries by bed estimate and returns the
-    list of filtered BedsRecords
-    Precondition: The beds_average column has been added to the
-    dataframe
-    """
-    sorted_data = data.sort_values(['beds_average'], 
-                                   ascending = ascending)
-    country_gb = sorted_data.groupby(['beds_average','country'],
-                                     sort = False)
-
-    return pack_records(country_gb, TOP_N)
-
-
-def process_by_average_estimated_capacity(data, ascending = False):
-    """
-    Filters by the N top or bottom countries by bed estimate and returns the
-    list of filtered BedsRecords
-    Precondition: The estimated_beds_average column has been added to the
-    dataframe
-    """
-    sorted_data = data.sort_values(['estimated_beds_average'], 
-                                   ascending = ascending)
-    country_gb = sorted_data.groupby(['estimated_beds_average','country'],
-                                     sort = False)
-
-    return pack_records(country_gb, TOP_N)
-
-
-def process_general_statistics(beds_df):
-    """
-
-    """
-    beds_total = float(beds_df['beds_total'].sum())
-    beds_average = float(beds_df['beds_total'].mean())
-    beds_std = float(beds_df['beds_total'].std())
-    raw_sources_count = dict(beds_df['source'].value_counts())
-
-    sources_count = {source: int(count) for source, count
-                     in raw_sources_count.items()}
-
-    general_data = BedsGeneralData(beds_total, beds_average, beds_std,
-                                   sources_count)
-
-    types_data = []
-
-    types_gb = beds_df.groupby('type')
-
-    for type_name, type_group in types_gb:
-        type_count = float(type_group['beds'].sum())
-        type_percentage = float(type_count / beds_total * 100)
-        type_average = float(type_group['beds'].mean())
-        type_std = float(type_group['beds'].std())
-
-        types_record = BedTypesGeneralData(type_name, type_count,
-                                           type_percentage, type_average,
-                                           type_std)
-
-        types_data.append(types_record)
-
-    return [general_data, types_data]
-
-
-def transform_beds_dataset(data):
-    """
-    Includes additional columns to the beds dataset:
-    - estimated_beds: the amount of beds per person
-    - estimated_beds_total: sum of all estimated_beds in a country groupby
-    - estiamted_beds_average: average of estimated_beds in a country groupby
-    - beds_total: sum of beds in a country groupby
-    - beds_total: average of beds in a country groupby
-    """
-    data['estimated_beds'] = data['population'] * data['beds'] / 10
-    data['estimated_beds_total'] = data.groupby('country') \
-                                            ['estimated_beds'] \
-                                        .transform('sum')
-    data['estimated_beds_average'] = data.groupby('country') \
-                                            ['estimated_beds'] \
-                                        .transform('mean')
-    data['beds_total'] = data.groupby('country')['beds'].transform('sum')
-    data['beds_average'] = data.groupby('country')['beds'] \
-                                .transform('mean')
-    data['population_average'] = data.groupby('country')['population'] \
-                                        .transform('mean')
-    
-    return data
-
-
-def pack_records(country_gb, limit = None):
-    """
-    From a filtered grouped dataframe, return a list of BedsRecords and 
-    BedsTypesData. If a limit is entered, only return the first elements up to
-    one before that limit
+    From a filtered grouped dataframe, returns a list of BedsRecords and
+    BedsTypesData objects
     Precondition: The dataset contains the beds_total, beds_average,
     population_average, estimated_beds, estimated_beds_total, and
     estimated_beds_average columns
     """
-    result = []
-
     country_records = []
     type_data = []
 
-    for country_name, country_group in [g for g in list(country_gb)[:limit]]:
+    for country_name, country_group in country_gb:
         beds_average = country_group['beds_average'].values[0]
         beds_total = country_group['beds_total'].values[0]
         population = country_group['population_average'].values[0]
@@ -204,7 +78,130 @@ def pack_records(country_gb, limit = None):
     return [country_records, type_data]
 
 
-def filter_beds(category, sampling = False):
+def _process_without_filter(data):
+    """
+    Returns the basic structure of the whole dataset without filter
+    """
+    country_gb = data.groupby('country')
+    return(_pack_records(country_gb))
+
+
+def _process_by_scale_capacity(data, ascending = False):
+    """
+    Filters by the N top or bottom countries by bed count and returns the list
+    of filtered BedsRecords
+    Precondition: The beds_total column has been added to the dataframe
+    """
+    sorted_data = data.sort_values(['beds_total'], ascending = ascending)
+    country_gb = sorted_data.groupby(['beds_total','country'], sort = False)
+
+    return _pack_records(country_gb, TOP_N)
+
+
+def _process_by_estimated_capacity(data, ascending = False):
+    """
+    Filters by the N top or bottom countries by bed estimate and returns the
+    list of filtered BedsRecords
+    Precondition: The estimated_beds_total column has been added to the
+    dataframe
+    """
+    sorted_data = data.sort_values(['estimated_beds_total'], 
+                                   ascending = ascending)
+    country_gb = sorted_data.groupby(['estimated_beds_total','country'],
+                                     sort = False)
+
+    return _pack_records(country_gb, TOP_N)
+
+
+def _process_by_average_scale_capacity(data, ascending = False):
+    """
+    Filters by the N top or bottom countries by bed estimate and returns the
+    list of filtered BedsRecords
+    Precondition: The beds_average column has been added to the
+    dataframe
+    """
+    sorted_data = data.sort_values(['beds_average'], 
+                                   ascending = ascending)
+    country_gb = sorted_data.groupby(['beds_average','country'],
+                                     sort = False)
+
+    return _pack_records(country_gb, TOP_N)
+
+
+def _process_by_average_estimated_capacity(data, ascending = False):
+    """
+    Filters by the N top or bottom countries by bed estimate and returns the
+    list of filtered BedsRecords
+    Precondition: The estimated_beds_average column has been added to the
+    dataframe
+    """
+    sorted_data = data.sort_values(['estimated_beds_average'], 
+                                   ascending = ascending)
+    country_gb = sorted_data.groupby(['estimated_beds_average','country'],
+                                     sort = False)
+
+    return _pack_records(country_gb, TOP_N)
+
+
+def _process_general_statistics(beds_df):
+    """
+    Retrieves the dataset's general statistics in a list of two elements:
+    [0] General information
+    [1] Type-specific information
+    """
+    beds_total = float(beds_df['beds_total'].sum())
+    beds_average = float(beds_df['beds_total'].mean())
+    beds_std = float(beds_df['beds_total'].std())
+    raw_sources_count = dict(beds_df['source'].value_counts())
+
+    sources_count = {source: int(count) for source, count
+                     in raw_sources_count.items()}
+
+    general_data = BedsGeneralData(beds_total, beds_average, beds_std,
+                                   sources_count)
+    types_data = []
+    types_gb = beds_df.groupby('type')
+
+    for type_name, type_group in types_gb:
+        type_count = float(type_group['beds'].sum())
+        type_percentage = float(type_count / beds_total * 100)
+        type_average = float(type_group['beds'].mean())
+        type_std = float(type_group['beds'].std())
+        if (pd.isna(type_std)):
+            type_std = 0.0
+
+        types_record = BedTypesGeneralData(type_name.lower(), type_count,
+                                           type_percentage, type_average,
+                                           type_std)
+        types_data.append(types_record)
+
+    return [general_data, types_data]
+
+
+def _transform_beds_dataset(data):
+    """
+    Includes additional columns to the beds dataset:
+    - estimated_beds: the amount of beds per person
+    - estimated_beds_total: sum of all estimated_beds in a country groupby
+    - estiamted_beds_average: average of estimated_beds in a country groupby
+    - beds_total: sum of beds in a country groupby
+    - beds_total: average of beds in a country groupby
+    """
+    data['estimated_beds'] = data['population'] * data['beds'] / 10
+    data['estimated_beds_total'] = data.groupby('country') \
+                                            ['estimated_beds'] \
+                                        .transform('sum')
+    data['estimated_beds_average'] = data.groupby('country') \
+                                            ['estimated_beds'] \
+                                        .transform('mean')
+    data['beds_total'] = data.groupby('country')['beds'].transform('sum')
+    data['beds_average'] = data.groupby('country')['beds'] \
+                                .transform('mean')
+    data['population_average'] = data.groupby('country')['population'] \
+                                        .transform('mean')    
+
+
+def _filter_beds(category, sampling = False):
     """
     Returns the dataset (pandas.core.frame.DataFrame) filtered by the input
     filter category. If the sampling parameter is set to true, only a number
@@ -220,30 +217,31 @@ def filter_beds(category, sampling = False):
         if sampling:
             data = data.head(BedsFilter.SAMPLE_RECORDS.value)
 
-        data = transform_beds_dataset(data)
+        _transform_beds_dataset(data)
 
         if (category == BedsFilter.NUMBER_PERCENT_COUNTRY_NORMAL.value):
-            return process_without_filter(data)
+            return _process_without_filter(data)
         elif (category == BedsFilter.TOP_COUNTRIES_SCALE.value):
-            return process_by_scale_capacity(data)
+            return _process_by_scale_capacity(data)
         elif (category == BedsFilter.BOTTOM_COUNTRIES_SCALE.value):
-            return process_by_scale_capacity(data, True)
+            return _process_by_scale_capacity(data, True)
         elif (category == BedsFilter.TOP_COUNTRIES_ESTIMATE.value):
-            return process_by_estimated_capacity(data)
+            return _process_by_estimated_capacity(data)
         elif (category == BedsFilter.BOTTOM_COUNTRIES_ESTIMATE.value):
-            return process_by_estimated_capacity(data, True)
+            return _process_by_estimated_capacity(data, True)
         elif (category == BedsFilter.TOP_COUNTRIES_AVG_SCALE.value):
-            return process_by_average_scale_capacity(data)
+            return _process_by_average_scale_capacity(data)
         elif (category == BedsFilter.BOTTOM_COUNTRIES_AVG_SCALE.value):
-            return process_by_average_scale_capacity(data, True)
+            return _process_by_average_scale_capacity(data, True)
         elif (category == BedsFilter.TOP_COUNTRIES_AVG_ESTIMATE.value):
-            return process_by_average_estimated_capacity(data)
+            return _process_by_average_estimated_capacity(data)
         elif (category == BedsFilter.BOTTOM_COUNTRIES_AVG_ESTIMATE.value):
-            return process_by_average_estimated_capacity(data, True)
+            return _process_by_average_estimated_capacity(data, True)
         else:
-            return process_general_statistics(data)
+            return _process_general_statistics(data)
     except FileNotFoundError:
-        print(f'The file "{BedsFilter.DATA_FILENAME.value}" does not exist')
+        print(f'The file "{BedsFilter.DATA_FILENAME.value}" does not exist')        
+        sys.exit('No file, no execution... Stopping!')
 
 
 def load_bed_records(filter_option, cli_mode = False, sampling = False,
@@ -255,14 +253,13 @@ def load_bed_records(filter_option, cli_mode = False, sampling = False,
     request will be sent to the API; otherwise, the sending must be specified
     through the send_request parameter
     """
-    records = filter_beds(filter_option, sampling)
+    records = _filter_beds(filter_option, sampling)
 
     general_json_list = records[0].to_json() \
         if (filter_option == BedsFilter.GENERAL_STATISTICS.value) \
         else [r.to_json() for r in records[0]]
 
-    types_json_list = [r.to_json()
-                        for r in records[1]]
+    types_json_list = [r.to_json() for r in records[1]]
 
     general_data = json.dumps(general_json_list, indent = 4)
     types_data = json.dumps(types_json_list, indent = 4)
@@ -275,6 +272,6 @@ def load_bed_records(filter_option, cli_mode = False, sampling = False,
         user_input = prompt_user(3)
 
         if (user_input.lower() == 'yes'):
-            api.send_beds_data(api_data)
+            api.send_data(api_data, api.BEDS_URL)
     elif (send_request):
-        api.send_beds_data(api_data)
+        api.send_data(api_data, api.BEDS_URL)
