@@ -18,13 +18,13 @@ def write_to_file(data, filename):
         print(e)
 
 
-def write_beds_data(general_json, types_json, filterIndex):
+def write_beds_data(general_json, types_json, filter_index):
     """
     Writes the entered beds json into a file named according to the chosen
     filter
     """
-    general_name = BedsFilter(filterIndex).name + '_GENERAL'
-    types_name = BedsFilter(filterIndex).name + '_TYPES'
+    general_name = BedsFilter(filter_index).name + '_GENERAL'
+    types_name = BedsFilter(filter_index).name + '_TYPES'
     general_filename = BedsFilter.EXPORT_FILENAME.value.replace("#", 
                                                                 general_name)
     types_filename = BedsFilter.EXPORT_FILENAME.value.replace("#", types_name)
@@ -33,17 +33,18 @@ def write_beds_data(general_json, types_json, filterIndex):
     write_to_file(types_json, types_filename)
 
 
-def write_measures_data(general_json, types_json, filterIndex):
+def write_measures_data(filter_index, general_json, types_json = None):
     """
     Writes the entered measures json into a file named according to the chosen
     filter
     """
-    general_name = MeasuresFilter(filterIndex).name + '_GENERAL'
-    types_name = MeasuresFilter(filterIndex).name + '_MEASURES'
+    general_name = MeasuresFilter(filter_index).name + '_GENERAL'
     general_filename = MeasuresFilter.EXPORT_FILENAME.value.replace("#", 
                                                                 general_name)
-    types_filename = MeasuresFilter.EXPORT_FILENAME.value.replace("#",
-                                                                  types_name)
-    
     write_to_file(general_json, general_filename)
-    write_to_file(types_json, types_filename)
+    
+    if (types_json):
+        types_name = MeasuresFilter(filter_index).name + '_MEASURES'
+        types_filename = MeasuresFilter.EXPORT_FILENAME.value.replace("#",
+                                                                  types_name)
+        write_to_file(types_json, types_filename)

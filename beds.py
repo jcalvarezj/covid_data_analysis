@@ -89,7 +89,7 @@ def _process_without_filter(data):
 def _process_by_scale_capacity(data, ascending = False):
     """
     Filters by the N top or bottom countries by bed count and returns the list
-    of filtered BedsRecords
+    of filtered BedsRecords and BedTypes
     Precondition: The beds_total column has been added to the dataframe
     """
     sorted_data = data.sort_values(['beds_total'], ascending = ascending)
@@ -101,7 +101,7 @@ def _process_by_scale_capacity(data, ascending = False):
 def _process_by_estimated_capacity(data, ascending = False):
     """
     Filters by the N top or bottom countries by bed estimate and returns the
-    list of filtered BedsRecords
+    list of filtered BedsRecords and BedTypesData
     Precondition: The estimated_beds_total column has been added to the
     dataframe
     """
@@ -115,8 +115,8 @@ def _process_by_estimated_capacity(data, ascending = False):
 
 def _process_by_average_scale_capacity(data, ascending = False):
     """
-    Filters by the N top or bottom countries by bed estimate and returns the
-    list of filtered BedsRecords
+    Filters by the N top or bottom countries by bed count average and returns 
+    the list of filtered BedsRecords and BedTypesData
     Precondition: The beds_average column has been added to the
     dataframe
     """
@@ -130,8 +130,8 @@ def _process_by_average_scale_capacity(data, ascending = False):
 
 def _process_by_average_estimated_capacity(data, ascending = False):
     """
-    Filters by the N top or bottom countries by bed estimate and returns the
-    list of filtered BedsRecords
+    Filters by the N top or bottom countries by bed estimate average and
+    returns the list of filtered BedsRecords and BedTypes
     Precondition: The estimated_beds_average column has been added to the
     dataframe
     """

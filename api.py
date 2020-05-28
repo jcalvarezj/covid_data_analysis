@@ -3,19 +3,15 @@ This module allows communication with the backend's API through POST requests
 with information of the datasets
 """
 
-import grequests
 import json
-
-
-BEDS_URL = 'https://api-covid-pi.now.sh/bed'
-MEASURES_URL = 'https://api-covid-pi.now.sh/xmeasurex' # TODO: Update endpoint
-HEADERS = {
-    "Content-type": "application/json",
-    "Accept": "text/plain"
-}
+import grequests
+from constants import BEDS_URL, MEASURES_URL, HEADERS
 
 
 def handle_exception(request, exception):
+    """
+    Exception handler callback function
+    """
     print('Could not perform the request due to a problem:')
     print(exception)
 

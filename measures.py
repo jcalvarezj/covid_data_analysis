@@ -4,15 +4,20 @@ This module contains functions for processing the measures/restrictions dataset
 
 import api
 import json
-from datetime import datetime
 import pycountry
 import pandas as pd
-from numpy import nan
+from datetime import datetime
 from commons import prompt_user
 from urllib.parse import urlparse
 from file_export import write_measures_data
-from datatypes import MeasuresGroupData, MeasuresData
 from constants import MeasuresFilter, TOP_N, REMAINING_ISO_CODES
+from datatypes import (MeasuresGroupData, MeasuresData, MeasuresGeneralData,
+                       MeasuresDetailData)
+
+
+def _get_series_count(series):
+    raw_count = dict(series.value_counts().sort_index())
+    return {keyword: int(count) for keyword, count in raw_count.items()}
 
 
 def _get_from_nan_col(value, is_list):
@@ -28,35 +33,50 @@ def _get_from_nan_col(value, is_list):
     return result
 
 
-def _pack_records(country_gb):
+def _get_separated_keywords(original_keywords_series):
+    """
+    Returns a Series with all independent keywords from the keywords Series
+    (separated from comma lists)
+    """
+    keywords_list = []
+
+    [[keywords_list.append(key) for key in record.split(', ')]
+     for record in original_keywords_series.values.tolist()]
+
+    return pd.Series(keywords_list)
+
+
+def _pack_records(country_gb, limit = None):
     """
     From a filtered grouped dataframe, return a list with MeasuresGroupData and
     MeasuresData lists
-    Precondition: The dataset has been normalized and contains the 'Code' and
-    'Source Domain' columns
+    Precondition: The dataset has been normalized and contains the 'Code',
+    'Source Domain' and 'Keywords Count' columns
     """
     measure_records = []
     measure_data = []
 
-    for country_name, country_group in country_gb:
-        keywords_list = []
+    for country_name, country_group in list(country_gb)[:limit]:
+        iso_code = ""
 
-        [[keywords_list.append(key) for key in record.split(', ')]
-         for record in country_group['Keywords'].values.tolist()]
-        
-        keywords_series = pd.Series(keywords_list)
-        raw_keywords_count = dict(keywords_series.value_counts().sort_index())
+        if (type(country_name) is tuple):
+            iso_code = country_name[1].lower()
+        else:
+            iso_code = country_name.lower()
 
-        keywords_count = {keyword: int(count) for keyword, count
-                          in raw_keywords_count.items()}
-
+        separated_keywords = _get_separated_keywords(country_group['Keywords'])
+        keywords_count = _get_series_count(separated_keywords)
+        keywords_total = int(country_group['Keywords Count'].values[0])
+        records_total = int(country_group['Records Count'].values[0])
         raw_sources_count = dict(country_group['Source Domain'].value_counts())
 
         sources_count = {source: int(count) for source, count
                          in raw_sources_count.items()}
 
-        new_record = MeasuresGroupData(code = country_name.lower(),
+        new_record = MeasuresGroupData(code = iso_code,
                                        keywords_count = keywords_count,
+                                       keywords_total = keywords_total,
+                                       keywords_records_total = records_total,
                                        sources_count = sources_count)
 
         measure_records.append(new_record)
@@ -95,7 +115,7 @@ def _pack_records(country_gb):
 
             source = _get_from_nan_col(row['Source'], False)
 
-            new_data = MeasuresData(code = country_name.lower(),
+            new_data = MeasuresData(code = iso_code,
                                     date_start = date_start,
                                     date_end = date_end,
                                     description = description,
@@ -131,10 +151,24 @@ def _get_url_domain(url):
     """
     Retrieves the domain from the input URL
     """
-    if(pd.notna(url)):
+    if (pd.notna(url)):
         return urlparse(url).netloc
     else:
-        return nan
+        return pd.NA
+
+
+def _count_different_keywords(keywords_series):
+    """
+    Returns the count of all unique separated keywords 
+    """
+    return len(_get_separated_keywords(keywords_series).unique())
+
+
+def _count_keywords_records(keywords_series):
+    """
+    Returns the count of all unique separated keywords 
+    """
+    return len(_get_separated_keywords(keywords_series))
 
 
 def _transform_measures_dataset(data):
@@ -147,15 +181,70 @@ def _transform_measures_dataset(data):
     data.dropna(subset = ['Keywords', 'Country'], inplace = True)
     data['Code'] = data['Country'].apply(_country_to_iso)
     data['Source Domain'] = data['Source'].apply(_get_url_domain)
+    data['Keywords Count'] = data.groupby('Code')['Keywords'] \
+                                     .transform(_count_different_keywords)
+    data['Records Count'] = data.groupby('Code')['Keywords'] \
+                                     .transform(_count_keywords_records)
 
 
 def _process_without_filter(data):
     """
-    Returns the basic structure of the whole dataset without filter
+    Returns the basic structure for the whole dataset without filter
     Precondition: the dataset has been normalized and it has the 'Code' column
     """
     country_gb = data.groupby('Code')
-    return(_pack_records(country_gb))
+    return _pack_records(country_gb)
+
+
+def _process_by_measure_count(data, ascending = False):
+    """
+    Returns the basic structure for the dataset, filtering by the N top or
+    bottom countries with a number 
+    Precondition: the dataset has been normalized and it has the 'Code' and
+    'Keywords Count' columns
+    """
+    country_gb = data.groupby('Code')
+    sorted_data = data.sort_values(['Keywords Count'], ascending = ascending)
+    country_gb = sorted_data.groupby(['Keywords Count','Code'], sort = False)
+
+    return _pack_records(country_gb, TOP_N)
+
+
+def _process_by_records_count(data, ascending = False):
+    """
+    Returns the basic structure for the dataset, filtering by the N top or
+    bottom countries with a number 
+    Precondition: the dataset has been normalized and it has the 'Code' and
+    'Keywords Count' columns
+    """
+    country_gb = data.groupby('Code')
+    sorted_data = data.sort_values(['Records Count'], ascending = ascending)
+    country_gb = sorted_data.groupby(['Records Count','Code'], sort = False)
+
+    return _pack_records(country_gb, TOP_N)
+
+
+def _process_general_information(data):
+    """
+    Returns the dataset's general information
+    Precondition: the dataset has been normalized and it has the 'Code',
+    'Keywords Count', and 'Source Domain' columns
+    """
+    counts = data[['Code', 'Keywords Count']]
+    unique_counts = counts[~counts.duplicated()]
+    m_counts = dict(zip(unique_counts['Code'],
+                        unique_counts['Keywords Count']))
+
+    separated_keywords = _get_separated_keywords(data['Keywords'])
+    keywords_count = _get_series_count(separated_keywords)
+
+    sources_count = _get_series_count(data['Source Domain'])
+
+    general_data = MeasuresGeneralData(countries_measures_count = m_counts,
+                                       all_keywords_count = keywords_count,
+                                       all_sources_count = sources_count)
+
+    return [general_data] # TODO: Including detail data - To be Determined
 
 
 def _filter_measures(category, sampling = False):
@@ -178,8 +267,16 @@ def _filter_measures(category, sampling = False):
         
         if (category == MeasuresFilter.GENERAL_COUNTRY_INFORMATION.value):
             return _process_without_filter(data)
+        elif (category == MeasuresFilter.TOP_COUNTRIES_MEASURE_COUNT.value):
+            return _process_by_measure_count(data)
+        elif (category == MeasuresFilter.BOTTOM_COUNTRIES_MEASURE_COUNT.value):
+            return _process_by_measure_count(data, ascending = True)
+        elif (category == MeasuresFilter.TOP_COUNTRIES_RECORDS_COUNT.value):
+            return _process_by_records_count(data)
+        elif (category == MeasuresFilter.BOTTOM_COUNTRIES_RECORDS_COUNT.value):
+            return _process_by_records_count(data, ascending = True)
         else:
-            raise Exception("Not implemented yet")
+            return _process_general_information(data)
     except FileNotFoundError:
         print(f'The file "{BedsFilter.DATA_FILENAME.value}" does not exist')
         sys.exit('No file, no execution... Stopping!')
@@ -197,24 +294,38 @@ def load_measure_records(filter_option, cli_mode = False, sampling = False,
     """
     records = _filter_measures(filter_option, sampling)
     
-    general_json_list = records[0].to_json() \
-        if (filter_option == MeasuresFilter.GENERAL_STATISTICS.value) \
-        else [r.to_json() for r in records[0]]
+    if (filter_option != MeasuresFilter.GENERAL_STATISTICS.value):
+        general_json_list = [r.to_json() for r in records[0]]
 
-    types_json_list = [r.to_json() for r in records[1]]
+        types_json_list = [r.to_json() for r in records[1]]
 
-    general_data = json.dumps(general_json_list, indent = 4)
-    types_data = json.dumps(types_json_list, indent = 4)
+        general_data = json.dumps(general_json_list, indent = 4)
+        types_data = json.dumps(types_json_list, indent = 4)
 
-    api_data = [general_data, types_data]
+        api_data = [general_data, types_data]
 
-    write_measures_data(general_data, types_data, filter_option)
+        write_measures_data(filter_option, general_data, types_data)
 
-    if (cli_mode):
-        user_input = prompt_user(3)
-        answer = user_input.lower() == 'yes'
+        if (cli_mode):
+            user_input = prompt_user(3)
+            answer = user_input.lower() == 'yes'
 
-        if (answer):
+            if (answer):
+                api.send_data(api_data, api.MEASURES_URL)
+        elif (send_request):
             api.send_data(api_data, api.MEASURES_URL)
-    elif (send_request):
-        api.send_data(api_data, api.MEASURES_URL)
+    else:
+        general_json_list = records[0].to_json()
+        general_data = json.dumps(general_json_list, indent = 4)
+        api_data = [general_data]
+        write_measures_data(filter_index = filter_option, 
+                            general_json = general_data)
+
+        if (cli_mode):
+            user_input = prompt_user(3)
+            answer = user_input.lower() == 'yes'
+
+            if (answer):
+                api.send_data(api_data, api.MEASURES_URL)
+        elif (send_request):
+            api.send_data(api_data, api.MEASURES_URL)

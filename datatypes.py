@@ -156,11 +156,14 @@ class MeasuresGroupData:
     This class represents general measures and restrictions information
     """
     def __init__(self, code = None, keywords_count = None,
+                 keywords_total = None, keywords_records_total = None,
                  sources_count = None, target_countries = None,
                  target_regions = None, target_states = None):
         self._code = code
         self._keywords_count = keywords_count
-        self._sources_count = sources_count        
+        self._keywords_total = keywords_total
+        self._keywords_records_total = keywords_records_total
+        self._sources_count = sources_count
 
 
     def __str__(self):
@@ -178,6 +181,8 @@ class MeasuresGroupData:
         return {
             'code': self._code,
             'keywordsCount': self._keywords_count,
+            'keywordsTotal': self._keywords_total,
+            'keywordsRecordsTotal': self._keywords_records_total,
             'sourcesCount': self._sources_count
         }
 
@@ -228,5 +233,58 @@ class MeasuresData:
             'implementingCities': self._implementing_cities,
             'implementingStates': self._implementing_states,
             'targetCountries': self._target_countries,
-            'targetRegions': self._target_regions
+            'targetRegions': self._target_regions,
+            'source': self._source
+        }
+
+
+class MeasuresGeneralData:
+    """
+    This class represents an object that stores general measures statistics
+    """
+    def __init__(self, countries_measures_count = None,
+                 all_keywords_count = None, all_sources_count = None):
+        self._countries_measures_count = countries_measures_count
+        self._all_keywords_count = all_keywords_count
+        self._all_sources_count = all_sources_count
+
+
+    def __str__(self):
+        return json.dumps(self.to_json())
+
+
+    def __repr__(self):
+        return str(self)
+
+
+    def to_json(self):
+        """
+        Returns the json representation of the MeasuresGeneralData instance
+        """
+        return {
+            'countriesMeasuresCount': self._countries_measures_count,
+            'allKeywordsCount': self._all_keywords_count,
+            'allSourcesCount': self._all_sources_count
+        }
+
+
+class MeasuresDetailData:
+    # TODO - Update or delete according to changes on functional requirements
+    """
+    This class represents an object that stores general measures detail
+    """
+    def __str__(self):
+        return json.dumps(self.to_json())
+
+
+    def __repr__(self):
+        return str(self)
+
+
+    def to_json(self):
+        """
+        Returns the json representation of the MeasuresDetailData instance
+        """
+        return {
+            'INFO': 'THIS IS A PLACEHOLDER. WILL BE DELETED IF NECESSARY'
         }

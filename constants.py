@@ -34,11 +34,13 @@ class MeasuresFilter(Enum):
     GENERAL_COUNTRY_INFORMATION = 1
     TOP_COUNTRIES_MEASURE_COUNT = 2
     BOTTOM_COUNTRIES_MEASURE_COUNT = 3
-    GENERAL_STATISTICS = 4
+    TOP_COUNTRIES_RECORDS_COUNT = 4
+    BOTTOM_COUNTRIES_RECORDS_COUNT = 5
+    GENERAL_STATISTICS = 6
     ## TODO: Add more filter options
     DATA_FILENAME = './data/measures.csv'
     EXPORT_FILENAME = './export/measures/#.json'
-    SAMPLE_RECORDS = 56
+    SAMPLE_RECORDS = 30
 
 
 TOP_N = 10
@@ -58,6 +60,8 @@ MEASURE_FILTERS = [
     'General measures by country',
     f'Top {TOP_N} contries with highest count of different measures',
     f'Top {TOP_N} contries with lowest count of different measures',
+    f'Top {TOP_N} contries with highest count of measure records',
+    f'Top {TOP_N} contries with lowest count of measure records',
     'General dataset statistics'
 ]
 MENU = [
@@ -85,4 +89,11 @@ REMAINING_ISO_CODES = {
     'Iran': 'IR',
     'Russia': 'RU',
     'Palestine': 'PS'
+}
+BEDS_URL = 'https://api-covid-pi.now.sh/bed'
+#MEASURES_URL = 'https://api-covid-pi.now.sh/xmeasurex' # TODO: Update endpoint
+MEASURES_URL = 'https://jsonplaceholder.typicode.com/posts' #TODO
+HEADERS = {
+    "Content-type": "application/json",
+    "Accept": "text/plain"
 }

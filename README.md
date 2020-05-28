@@ -61,6 +61,11 @@ Use either  `python main.py`  or  `python3 main.py` for a guided Command Line In
 **Measures and restrictions filters:**
 
 1. General measures information by country
+2. Top 10 countries with highest number of different measures/restrictions
+3. Top 10 countries with lowest number of different measures/restrictions
+4. Top 10 countries with highest number of measures/restrictions records
+5. Top 10 countries with lowest number of measures/restrictions records
+6. General dataset information
 
 
 Finally, the optional argument 'post' can be added to send a request to the defined backend API
