@@ -198,7 +198,7 @@ def _transform_beds_dataset(data):
     data['beds_average'] = data.groupby('country')['beds'] \
                                 .transform('mean')
     data['population_average'] = data.groupby('country')['population'] \
-                                        .transform('mean')    
+                                        .transform('mean')
 
 
 def _filter_beds(category, sampling = False):
@@ -240,7 +240,7 @@ def _filter_beds(category, sampling = False):
         else:
             return _process_general_statistics(data)
     except FileNotFoundError:
-        print(f'The file "{BedsFilter.DATA_FILENAME.value}" does not exist')        
+        print(f'The file "{BedsFilter.DATA_FILENAME.value}" does not exist')
         sys.exit('No file, no execution... Stopping!')
 
 

@@ -17,7 +17,8 @@ from datatypes import (MeasuresGroupData, MeasuresData, MeasuresGeneralData,
 
 def _get_series_count(series):
     raw_count = dict(series.value_counts().sort_index())
-    return {keyword: int(count) for keyword, count in raw_count.items()}
+    return [{"keywords": keyword, "count": int(count)}
+            for keyword, count in raw_count.items()]
 
 
 def _get_from_nan_col(value, is_list):
@@ -70,8 +71,8 @@ def _pack_records(country_gb, limit = None):
         records_total = int(country_group['Records Count'].values[0])
         raw_sources_count = dict(country_group['Source Domain'].value_counts())
 
-        sources_count = {source: int(count) for source, count
-                         in raw_sources_count.items()}
+        sources_count = [{"sources": source, "count": int(count)}
+                         for source, count in raw_sources_count.items()]
 
         new_record = MeasuresGroupData(code = iso_code,
                                        keywords_count = keywords_count,

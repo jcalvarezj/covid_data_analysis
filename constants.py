@@ -91,8 +91,7 @@ REMAINING_ISO_CODES = {
     'Palestine': 'PS'
 }
 BEDS_URL = 'https://api-covid-pi.now.sh/bed'
-#MEASURES_URL = 'https://api-covid-pi.now.sh/xmeasurex' # TODO: Update endpoint
-MEASURES_URL = 'https://jsonplaceholder.typicode.com/posts' #TODO
+MEASURES_URL = 'https://api-covid-pi.now.sh/xmeasurex' # TODO: Update endpoint
 HEADERS = {
     "Content-type": "application/json",
     "Accept": "text/plain"
