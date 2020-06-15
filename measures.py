@@ -11,11 +11,13 @@ from commons import prompt_user
 from urllib.parse import urlparse
 from file_export import write_measures_data
 from constants import MeasuresFilter, TOP_N, REMAINING_ISO_CODES
-from datatypes import (MeasuresGroupData, MeasuresData, MeasuresGeneralData,
-                       MeasuresDetailData)
+from datatypes import MeasuresGroupData, MeasuresData, MeasuresGeneralData
 
 
 def _get_series_count(series):
+    """
+    Returns a structure with the count of keywords for the input keyword series
+    """
     raw_count = dict(series.value_counts().sort_index())
     return [{"keywords": keyword, "count": int(count)}
             for keyword, count in raw_count.items()]

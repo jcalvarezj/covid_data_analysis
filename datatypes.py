@@ -266,25 +266,3 @@ class MeasuresGeneralData:
             'allKeywordsCount': self._all_keywords_count,
             'allSourcesCount': self._all_sources_count
         }
-
-
-class MeasuresDetailData:
-    # TODO - Update or delete according to changes on functional requirements
-    """
-    This class represents an object that stores general measures detail
-    """
-    def __str__(self):
-        return json.dumps(self.to_json())
-
-
-    def __repr__(self):
-        return str(self)
-
-
-    def to_json(self):
-        """
-        Returns the json representation of the MeasuresDetailData instance
-        """
-        return {
-            'INFO': 'THIS IS A PLACEHOLDER. WILL BE DELETED IF NECESSARY'
-        }
