@@ -1,6 +1,6 @@
 # Data Analysis Tool for COVID-19-related Datasets
 
-This program made in Python is used to filter data from CSV files from two datasets related to the COVID-19 pandemic:
+This Python CLI application is used to filter data from CSV files from two datasets related to the COVID-19 pandemic:
 
 1. [Global Hospital Beds Capacity (for covid-19) by Igor Kiulian](https://www.kaggle.com/ikiulian/global-hospital-beds-capacity-for-covid19)
 2. [COVID-19 containment and mitigation measures by Paul Mooney](https://www.kaggle.com/paultimothymooney/covid19-containment-and-mitigation-measures)
