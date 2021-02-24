@@ -15,9 +15,9 @@ This Python CLI application is used to filter data from CSV files from two datas
 
 - Clone into a new directory and navigate inside it
 
-- Create a new virtual environment using **virtualenv**
+- Create a new virtual environment using **virtualenv** for Windows or **venv** for Linux
 
-    For example, `virtualenv venv`
+    For example, `virtualenv venv` or `python3 -m venv venv` respectively
 
 - Activate venv
 
