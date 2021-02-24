@@ -34,7 +34,7 @@ This Python CLI application is used to filter data from CSV files from two datas
 
 ## Execution
 
-Use either  `python main.py`  or  `python3 main.py` for a guided Command Line Interface menu, or execute using arguments as follows:
+Use either  `python main.py`  or  `python3 main.py` (according to your system) for a guided Command Line Interface menu, or execute using arguments as follows:
 
 `python main.py <index of dataset> <index of filter> [post]`
 
